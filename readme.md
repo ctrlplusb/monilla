@@ -1,6 +1,6 @@
 > **Work in Progress**
 >
-> None of the below actually exists. I'm just riffing on some ideas. All subject to change, or to never come into existence in the first place.
+> None of the below actually exists. I'm just riffing on some ideas. All subject to change, or to never come into existence.
 
 # yalcd
 
@@ -24,9 +24,9 @@ This is a CLI tool to support dependency management within a monorepo.
 
 It does this **without** the use of hoisting.
 
-I've faced too many frustrating bugs requiring delicate configuration magic in order to move forward. I honestly can't deal with that anymore. I want an experience where each package feels as stable as if I had performed simple `npm install` against each of them.
+I've faced too many frustrating bugs related to hoisting that required delicate configuration magic in order to move forward. I honestly can't deal with that anymore. I want an experience where each package feels as stable as if I had performed a simple `npm install` against each of them.
 
-This tool enables this "vanilla" approach, hiding away the tedious process were you to perform this manually. Each package owns its own dependencies, with a standard `npm install` being executed against them. Cross package dependencies are enabled by wrapping up commands to the amazing [Yalc CLI](https://github.com/wclr/yalc). Yalc enables package references in a manner which closely resembles the experience of pulling down a package directly from the npm registry.
+This tool enables this "vanilla" approach, hiding away the tedious process were you to perform the required tasks manually. Each package owns its own dependencies, with a standard `npm install` being executed against them. Cross package dependencies are enabled by wrapping up commands to the amazing [Yalc CLI](https://github.com/wclr/yalc). Yalc enables local package references in a manner which closely resembles the experience of pulling down a package directly from the npm registry.
 
 I strongly feel this is the way back to sanity for me in terms of monorepo development. You might too.
 
@@ -36,13 +36,21 @@ I strongly feel this is the way back to sanity for me in terms of monorepo devel
 
 Comparing this approach to the workspaces approaches utilised by npm or Yarn, there are a few trade offs being made;
 
-- disk space
+- **Disk space**
 
   Yeah, you'll use more of it with our approach. Honestly, I'm happy to sacrifice a few megabytes in exchange for my sanity. Your call.
 
-- features
+- **Workspace features**
 
   npm/Yarn workspaces provide a lot of additional features, such as command delegation into specific packages within a repo. Some other features such as the interactive upgrade of Yarn is more efficient than our approach, but again I prefer to be more explicit and take a bit longer when performing dependency updates.
+
+- **Publishing**
+
+  This tool is meant for private packages. I haven't considered workflows for packages that require to be published to a registry.
+
+- **Supported Package Managers**
+
+  I'm only interested in supporting npm right now. I want to keep this tool as vanilla/boring as I can.
 
 ## Installation
 

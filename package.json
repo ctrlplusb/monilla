@@ -1,0 +1,77 @@
+{
+  "name": "yalcd",
+  "version": "0.0.1",
+  "description": "Manage your monorepo inter-package dependencies like a boss",
+  "homepage": "https://github.com/ctrlplusb/yalcd",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ctrlplusb/yalcd.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "yalcd": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup-node src/cli.ts --sourcemap inline --format cjs --legacy-output",
+    "lint": "eslint . --ext .js,.ts,.json",
+    "test": "jest",
+    "typecheck": "tsc"
+  },
+  "keywords": [
+    "monorepo",
+    "node",
+    "cli",
+    "npm",
+    "yarn"
+  ],
+  "author": "Sean Matheson",
+  "license": "MIT",
+  "dependencies": {
+    "yargs": "^17.5.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "@types/node": "^17.0.32",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^26.1.5",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^28.1.0",
+    "prettier": "^2.6.2",
+    "ts-jest": "^28.0.2",
+    "tsup": "^5.12.7",
+    "typescript": "^4.6.4"
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "jest",
+      "prettier"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:jest/recommended",
+      "plugin:import/recommended",
+      "plugin:import/typescript",
+      "plugin:prettier/recommended"
+    ],
+    "env": {
+      "node": true,
+      "jest": true
+    }
+  },
+  "eslintIgnore": [
+    "dist"
+  ],
+  "prettier": {
+    "trailingComma": "all"
+  }
+}

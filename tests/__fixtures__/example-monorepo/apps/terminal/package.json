@@ -1,0 +1,12 @@
+{
+  "name": "@my/terminal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "Sean Matheson",
+  "license": "ISC",
+  "dependencies": {
+    "@my/messages": "file:../messages"
+  }
+}

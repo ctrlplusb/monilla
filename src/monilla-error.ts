@@ -24,7 +24,7 @@ export function errorMessageFor(code: ErrorCode): string {
   return errorMessages[code];
 }
 
-export class YalcdError extends CustomError {
+export class MonillaError extends CustomError {
   public constructor(public code: ErrorCode, public hint?: string) {
     super(errorMessages[code]);
   }

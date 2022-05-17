@@ -2,7 +2,7 @@ import globby from "globby";
 import path from "path";
 import { PackageJson } from "type-fest";
 
-import { ErrorCode, YalcdError } from "./yalcd-error";
+import { ErrorCode, MonillaError } from "./monilla-error";
 
 export type PackageMeta = {
   name: string;
@@ -23,7 +23,7 @@ export function resolvePackages(rootDir: string): PackageMeta[] {
     const packageJson: PackageJson = require(packageJsonPath);
 
     if (packageJson.name == null || packageJson.name.trim().length === 0) {
-      throw new YalcdError(
+      throw new MonillaError(
         ErrorCode.InvalidPackageJSON,
         `Package "${packageJsonPath}" has no name.`,
       );

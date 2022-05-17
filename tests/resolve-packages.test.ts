@@ -12,7 +12,7 @@ describe("resolvePackages", () => {
 
   it("[integration] should resolve the expected packages", () => {
     const actual = resolvePackages(
-      path.join(__dirname, "__fixtures__/example-monorepo"),
+      path.join(__dirname, "__fixtures__/simple-monorepo"),
     );
 
     expect(actual).toMatchSnapshot();

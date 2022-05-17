@@ -1,5 +1,5 @@
+import { ErrorCode, MonillaError } from "./monilla-error";
 import { PackageMeta } from "./resolve-packages";
-import { ErrorCode, YalcdError } from "./yalcd-error";
 
 type DependencyNode = PackageMeta[];
 
@@ -68,7 +68,7 @@ export function dependencyGraph(packageMetas: PackageMeta[]): DependencyGraph {
     });
 
     if (nextLevel.length === 0) {
-      throw new YalcdError(ErrorCode.CircularDependency);
+      throw new MonillaError(ErrorCode.CircularDependency);
     }
 
     dependencyGraph.push(nextLevel);

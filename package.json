@@ -29,17 +29,24 @@
   "author": "Sean Matheson",
   "license": "MIT",
   "dependencies": {
+    "find-up": "^5.0.0",
+    "fs-extra": "^10.1.0",
     "globby": "^11.1.0",
+    "npm-packlist": "^5.0.3",
+    "read-pkg": "^5.2.0",
     "ts-custom-error": "^3.2.0",
     "type-fest": "^2.12.2",
-    "yargs": "^17.5.0",
+    "write-pkg": "^4.0.0",
+    "yargs": "^17.5.1",
     "zod": "^3.16.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.5.1",
     "@types/node": "^16.11.35",
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.23.0",
+    "@types/npm-packlist": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.24.0",
+    "@typescript-eslint/parser": "^5.24.0",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",
@@ -51,7 +58,7 @@
     "prettier": "^2.6.2",
     "tempy": "^1.0.1",
     "ts-jest": "^28.0.2",
-    "tsup": "^5.12.7",
+    "tsup": "^5.12.8",
     "typescript": "^4.6.4"
   },
   "eslintConfig": {

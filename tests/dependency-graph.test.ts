@@ -1,8 +1,8 @@
 import path from "path";
 
 import { dependencyGraph } from "~/dependency-graph";
+import { ErrorCode, errorMessageFor } from "~/monilla-error";
 import { PackageMeta, resolvePackages } from "~/resolve-packages";
-import { ErrorCode, errorMessageFor } from "~/yalcd-error";
 
 describe("dependencyGraph", () => {
   const root: PackageMeta = {
@@ -18,9 +18,9 @@ describe("dependencyGraph", () => {
     expect(actual).toEqual([]);
   });
 
-  test("[integration test] should resolve the expected graph", () => {
+  test("[integration] should resolve the expected graph", () => {
     const packages = resolvePackages(
-      path.join(__dirname, "__fixtures__/example-monorepo"),
+      path.join(__dirname, "__fixtures__/simple-monorepo"),
     );
 
     const actual = dependencyGraph(packages);

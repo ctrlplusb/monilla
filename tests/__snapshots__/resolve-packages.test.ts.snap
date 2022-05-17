@@ -6,7 +6,7 @@ Array [
     "isRoot": true,
     "name": "example-monorepo",
     "packageJson": Object {
-      "description": "Example monorepo to aid testing of yalcd",
+      "description": "Example monorepo to aid testing of Monilla",
       "name": "example-monorepo",
       "private": true,
       "version": "1.0.0",

@@ -1,8 +1,8 @@
 {
   "name": "monilla",
   "version": "0.0.1",
-  "description": "Manage your monorepo dependencies",
-  "homepage": "https://github.com/ctrlplusb/yalcd",
+  "description": "Manage your monorepo dependencies in a vanilla-esque manner.",
+  "homepage": "https://github.com/ctrlplusb/monilla",
   "repository": {
     "type": "git",
     "url": "https://github.com/ctrlplusb/monilla.git"

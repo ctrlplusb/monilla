@@ -2,5 +2,5 @@
   "private": true,
   "name": "example-monorepo",
   "version": "1.0.0",
-  "description": "Example monorepo to aid testing of yalcd"
+  "description": "Example monorepo to aid testing of Monilla"
 }

@@ -1,17 +1,17 @@
 {
-  "name": "yalcd",
+  "name": "monilla",
   "version": "0.0.1",
   "description": "Manage your monorepo dependencies",
   "homepage": "https://github.com/ctrlplusb/yalcd",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ctrlplusb/yalcd.git"
+    "url": "https://github.com/ctrlplusb/monilla.git"
   },
   "files": [
     "dist"
   ],
   "bin": {
-    "yalcd": "dist/cli.js"
+    "monilla": "dist/cli.js"
   },
   "scripts": {
     "build": "tsup-node src/cli.ts --sourcemap inline --format cjs --legacy-output",

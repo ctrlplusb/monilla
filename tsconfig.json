@@ -5,6 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "isolatedModules": false,
     "module": "CommonJS",
+    "resolveJsonModule": true,
     "strict": true,
     "target": "ES2020",
     "moduleResolution": "Node",

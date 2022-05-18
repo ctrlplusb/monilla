@@ -34,10 +34,12 @@
   "author": "Sean Matheson",
   "license": "MIT",
   "dependencies": {
+    "child-process-toolbox": "^3.0.4",
     "find-up": "^5.0.0",
     "fs-extra": "^10.1.0",
     "globby": "^11.1.0",
     "npm-packlist": "^5.0.3",
+    "p-series": "^2.1.0",
     "read-pkg": "^5.2.0",
     "ts-custom-error": "^3.2.0",
     "type-fest": "^2.12.2",

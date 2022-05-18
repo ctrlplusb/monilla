@@ -1,12 +1,14 @@
+import pSeries from "p-series";
+
 import { ErrorCode, MonillaError } from "./monilla-error";
 import { PackageMeta } from "./resolve-packages";
 
-type DependencyNode = PackageMeta[];
+export type PackageTreeLevel = PackageMeta[];
 
-type DependencyGraph = DependencyNode[];
+export type PackageTree = PackageTreeLevel[];
 
-export function dependencyGraph(packageMetas: PackageMeta[]): DependencyGraph {
-  const dependencyGraph: DependencyGraph = [];
+export function buildPackageTree(packageMetas: PackageMeta[]): PackageTree {
+  const dependencyGraph: PackageTree = [];
   const packagesAddedToGraph: PackageMeta[] = [];
 
   const rootPackageMeta = packageMetas.find((p) => p.isRoot);
@@ -83,4 +85,21 @@ export function dependencyGraph(packageMetas: PackageMeta[]): DependencyGraph {
   buildGraph(otherPackageMetas);
 
   return dependencyGraph;
+}
+
+export async function executeAgainstPackageTree(
+  packageTree: PackageTree,
+  action: (packageMeta: PackageMeta) => unknown,
+): Promise<unknown> {
+  if (packageTree.length === 0) {
+    return Promise.resolve();
+  }
+  return pSeries(
+    packageTree.map(
+      (treeLevel) => () =>
+        Promise.all(
+          treeLevel.map((packageMeta) => Promise.resolve(action(packageMeta))),
+        ),
+    ),
+  );
 }

@@ -1,22 +1,27 @@
 import globby from "globby";
-import path from "path";
+import path, { dirname } from "path";
 import { PackageJson } from "type-fest";
 
 import { ErrorCode, MonillaError } from "./monilla-error";
 
 export type PackageMeta = {
   name: string;
-  path: string;
+  directory: string;
   packageJson: PackageJson;
+  packageJsonPath: string;
   isRoot: boolean;
 };
 
-export function resolvePackages(rootDir: string): PackageMeta[] {
+export async function resolvePackages(
+  rootDirectory: string,
+): Promise<PackageMeta[]> {
   const packageJsons: PackageMeta[] = [];
 
-  const rootPackageJsonPath = path.join(rootDir, "package.json");
+  const rootPackageJsonPath = path.join(rootDirectory, "package.json");
 
-  const packageJsonPaths = globby.sync(path.join(rootDir, "/**/package.json"));
+  const packageJsonPaths = await globby(
+    path.join(rootDirectory, "/**/package.json"),
+  );
 
   for (const packageJsonPath of packageJsonPaths) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -31,8 +36,9 @@ export function resolvePackages(rootDir: string): PackageMeta[] {
 
     packageJsons.push({
       name: packageJson.name,
-      path: packageJsonPath.replace(rootDir, "."),
+      directory: dirname(packageJsonPath),
       packageJson,
+      packageJsonPath,
       isRoot: rootPackageJsonPath === packageJsonPath,
     });
   }

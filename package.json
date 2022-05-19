@@ -5,7 +5,7 @@
   "homepage": "https://github.com/ctrlplusb/monilla",
   "engines": {
     "node": ">=16",
-    "npm": ">=8"
+    "npm": ">=8.8.0"
   },
   "engineStrict": true,
   "repository": {

@@ -1,19 +1,19 @@
 import { spawn } from "child_process";
-import { echoChildProcessOutput, promiseKilled } from "child-process-toolbox";
+import { echoChildProcessOutput } from "child-process-toolbox";
 
-import { PackageMeta } from "./resolve-packages";
+import { PackageMeta } from "./packages";
 
 export async function runCommandAgainstPackage(
   packageMeta: PackageMeta,
   command: string,
-  args: string[] = [],
-) {
+  args: readonly string[] = [],
+): Promise<void> {
   const childProcess = spawn(command, args, {
     cwd: packageMeta.directory,
   });
 
   console.info(
-    `[${packageMeta.name}]  Running command: ${command} ${args.join(" ")}`,
+    `[${packageMeta.name}] Running command: ${command} ${args.join(" ")}`,
   );
 
   echoChildProcessOutput(childProcess, {
@@ -21,5 +21,11 @@ export async function runCommandAgainstPackage(
     outPrefix: `[${packageMeta.name}] `,
   });
 
-  await promiseKilled(childProcess);
+  return new Promise((resolve) => {
+    childProcess.on("exit", (code) => {
+      // TODO: Handle failures etc
+      console.log(`[${packageMeta.name}] Exited with code "${code}"`);
+      resolve();
+    });
+  });
 }

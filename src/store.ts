@@ -1,11 +1,28 @@
 import crypto from "crypto";
-import fs from "fs-extra";
+import fs, { mkdir, pathExists } from "fs-extra";
 import npmPacklist from "npm-packlist";
 import path from "path";
 import readPkg, { NormalizedPackageJson } from "read-pkg";
 
-import { signatureFileName } from "./constants";
+import { monillaDirectoryName, signatureFileName } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";
+import { resolveRootDirectory } from "./resolve-root-directory";
+
+export async function resolveStoreDirectory(workingDirectory: string) {
+  const rootDirectory = await resolveRootDirectory(workingDirectory);
+
+  const storeDirectory = path.join(
+    rootDirectory,
+    monillaDirectoryName,
+    "node_modules",
+  );
+
+  if (!(await pathExists(storeDirectory))) {
+    await mkdir(storeDirectory, { recursive: true });
+  }
+
+  return storeDirectory;
+}
 
 const fixScopedRelativeName = (path: string) => path.replace(/^\.\//, "");
 

@@ -1,6 +1,17 @@
+import { readFile } from "fs-extra";
+import path from "path";
 import * as z from "zod";
 
+import { configFileName } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";
+import { resolveRootDirectory } from "./resolve-root-directory";
+
+export async function resolveConfig(workingDirectory: string): Promise<string> {
+  const rootDirectory = await resolveRootDirectory(workingDirectory);
+  const configFilePath = path.join(rootDirectory, configFileName);
+  const contents = readFile(configFilePath, "utf-8");
+  return contents;
+}
 
 /*
 {

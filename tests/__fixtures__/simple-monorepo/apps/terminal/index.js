@@ -1,3 +1,4 @@
+const { log } = require("@my/logger");
 const { helloWorld } = require("@my/messages");
 
-console.log(helloWorld);
+log(helloWorld);

@@ -6,7 +6,7 @@ import {
 import path from "path";
 
 import { signatureFileName } from "~/constants";
-import { copyPackageToStore } from "~/copy-package-to-store";
+import { copyPackageToStore } from "~/store";
 
 describe("copyPackageToStore", () => {
   let storeDirectory: string;

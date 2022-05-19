@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import tempy from "tempy";
 
+import { parseConfig, resolveConfig } from "~/config";
 import { configFileName } from "~/constants";
 import { ErrorCode, errorMessageFor } from "~/monilla-error";
-import { resolveConfig } from "~/resolve-config";
 
 describe("resolve-config", () => {
   it("should throw when no config file exists", async () => {
@@ -26,5 +26,11 @@ describe("resolve-config", () => {
 
     // ASSERT
     expect(actual).toEqual(expected);
+  });
+});
+
+describe("parse-config", () => {
+  it("should throw if config does not match the expected schema", () => {
+    expect(() => parseConfig(__dirname)).toThrow(Error);
   });
 });

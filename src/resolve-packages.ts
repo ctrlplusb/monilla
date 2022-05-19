@@ -10,6 +10,7 @@ export type PackageMeta = {
   packageJson: PackageJson;
   packageJsonPath: string;
   isRoot: boolean;
+  internalPackageDependencies: string[];
 };
 
 export async function resolvePackages(
@@ -23,7 +24,9 @@ export async function resolvePackages(
     path.join(rootDirectory, "/**/package.json"),
   );
 
-  for (const packageJsonPath of packageJsonPaths) {
+  const packages = packageJsonPaths.reduce<
+    Record<string, { packageJsonPath: string; packageJson: PackageJson }>
+  >((acc, packageJsonPath) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const packageJson: PackageJson = require(packageJsonPath);
 
@@ -34,12 +37,36 @@ export async function resolvePackages(
       );
     }
 
+    acc[packageJson.name] = {
+      packageJsonPath,
+      packageJson,
+    };
+
+    return acc;
+  }, {});
+
+  const packageNames = Object.keys(packages);
+
+  for (const packageName of packageNames) {
+    const { packageJson, packageJsonPath } = packages[packageName];
+
+    const dependencies = [
+      ...Object.keys(packageJson.dependencies || {}),
+      ...Object.keys(packageJson.devDependencies || {}),
+      ...Object.keys(packageJson.peerDependencies || {}),
+    ];
+
+    const internalPackageDependencies = packageNames.filter((name) => {
+      return dependencies.includes(name);
+    });
+
     packageJsons.push({
-      name: packageJson.name,
+      name: packageName,
       directory: dirname(packageJsonPath),
       packageJson,
       packageJsonPath,
       isRoot: rootPackageJsonPath === packageJsonPath,
+      internalPackageDependencies,
     });
   }
 

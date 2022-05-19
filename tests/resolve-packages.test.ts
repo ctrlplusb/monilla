@@ -18,18 +18,38 @@ describe("resolvePackages", () => {
 
     const actual = await resolvePackages(workingDirectory);
 
-    expect(actual).toEqual([
+    expect(actual.sort((a, b) => a.name.localeCompare(b.name))).toMatchObject([
       {
-        name: "example-monorepo",
-        packageJsonPath: path.join(workingDirectory, "./package.json"),
-        directory: workingDirectory,
+        name: "@my/logger",
+        packageJsonPath: path.join(
+          workingDirectory,
+          "./packages/logger/package.json",
+        ),
+        directory: path.join(workingDirectory, "./packages/logger"),
         packageJson: {
           private: true,
-          name: "example-monorepo",
+          name: "@my/logger",
           version: "1.0.0",
-          description: "Example monorepo to aid testing of Monilla",
+          main: "index.js",
         },
-        isRoot: true,
+        isRoot: false,
+        internalPackageDependencies: [],
+      },
+      {
+        name: "@my/messages",
+        packageJsonPath: path.join(
+          workingDirectory,
+          "./packages/messages/package.json",
+        ),
+        directory: path.join(workingDirectory, "./packages/messages"),
+        packageJson: {
+          private: true,
+          name: "@my/messages",
+          version: "1.0.0",
+          main: "index.js",
+        },
+        isRoot: false,
+        internalPackageDependencies: [],
       },
       {
         name: "@my/terminal",
@@ -47,25 +67,25 @@ describe("resolvePackages", () => {
           author: "Sean Matheson",
           license: "ISC",
           dependencies: {
-            "@my/messages": "file:../messages",
+            "@my/logger": "*",
+            "@my/messages": "*",
           },
         },
         isRoot: false,
+        internalPackageDependencies: ["@my/logger", "@my/messages"],
       },
       {
-        name: "@my/messages",
-        packageJsonPath: path.join(
-          workingDirectory,
-          "./packages/messages/package.json",
-        ),
-        directory: path.join(workingDirectory, "./packages/messages"),
+        name: "example-monorepo",
+        packageJsonPath: path.join(workingDirectory, "./package.json"),
+        directory: workingDirectory,
         packageJson: {
           private: true,
-          name: "@my/messages",
+          name: "example-monorepo",
           version: "1.0.0",
-          main: "index.js",
+          description: "Example monorepo to aid testing of Monilla",
         },
-        isRoot: false,
+        isRoot: true,
+        internalPackageDependencies: [],
       },
     ]);
   });

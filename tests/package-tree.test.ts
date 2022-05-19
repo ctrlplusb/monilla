@@ -4,6 +4,7 @@ import { ErrorCode, errorMessageFor } from "~/monilla-error";
 import {
   buildPackageTree,
   executeAgainstPackageTree,
+  PackageNode,
   PackageTreeLevel,
 } from "~/package-tree";
 import { PackageMeta, resolvePackages } from "~/resolve-packages";
@@ -15,6 +16,7 @@ describe("buildPackageTree", () => {
     isRoot: true,
     packageJsonPath: "./package.json",
     directory: "./",
+    internalPackageDependencies: [],
   };
 
   test("should return an empty array if no packageJsons are provided", () => {
@@ -31,9 +33,24 @@ describe("buildPackageTree", () => {
     const actual = buildPackageTree(packages);
 
     expect(actual).toMatchObject([
-      [{ name: "example-monorepo" }],
-      [{ name: "@my/messages" }],
-      [{ name: "@my/terminal" }],
+      [{ packageMeta: { name: "example-monorepo" } }],
+      expect.arrayContaining([
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "@my/logger" }),
+        }),
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "@my/messages" }),
+        }),
+      ]),
+      [
+        {
+          packageMeta: { name: "@my/terminal" },
+          dependencies: expect.arrayContaining([
+            expect.objectContaining({ name: "@my/logger" }),
+            expect.objectContaining({ name: "@my/messages" }),
+          ]),
+        },
+      ],
     ]);
   });
 
@@ -49,17 +66,19 @@ describe("buildPackageTree", () => {
 
     const a: PackageMeta = {
       name: "a",
-      packageJson: { dependencies: { b: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./a/package.json",
       directory: "./a/",
+      internalPackageDependencies: ["b"],
     };
     const b: PackageMeta = {
       name: "b",
-      packageJson: { dependencies: { c: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./b/package.json",
       directory: "./b/",
+      internalPackageDependencies: ["c"],
     };
     const c: PackageMeta = {
       name: "c",
@@ -67,6 +86,7 @@ describe("buildPackageTree", () => {
       isRoot: false,
       packageJsonPath: "./c/package.json",
       directory: "./c/",
+      internalPackageDependencies: [],
     };
 
     // ACT
@@ -74,10 +94,10 @@ describe("buildPackageTree", () => {
 
     // EXPECT
     expect(actual).toMatchObject([
-      [{ name: "root" }],
-      [{ name: "c" }],
-      [{ name: "b" }],
-      [{ name: "a" }],
+      [{ packageMeta: { name: "root" }, dependencies: [] }],
+      [{ packageMeta: { name: "c" }, dependencies: [] }],
+      [{ packageMeta: { name: "b" }, dependencies: [{ name: "c" }] }],
+      [{ packageMeta: { name: "a" }, dependencies: [{ name: "b" }] }],
     ]);
   });
 
@@ -92,10 +112,11 @@ describe("buildPackageTree", () => {
 
     const a: PackageMeta = {
       name: "a",
-      packageJson: { dependencies: { b: "*", c: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./a/package.json",
       directory: "./a/",
+      internalPackageDependencies: ["b", "c"],
     };
     const b: PackageMeta = {
       name: "b",
@@ -103,6 +124,7 @@ describe("buildPackageTree", () => {
       isRoot: false,
       packageJsonPath: "./b/package.json",
       directory: "./b/",
+      internalPackageDependencies: [],
     };
     const c: PackageMeta = {
       name: "c",
@@ -110,6 +132,7 @@ describe("buildPackageTree", () => {
       isRoot: false,
       packageJsonPath: "./c/package.json",
       directory: "./c/",
+      internalPackageDependencies: [],
     };
 
     // ACT
@@ -117,9 +140,31 @@ describe("buildPackageTree", () => {
 
     // EXPECT
     expect(actual).toMatchObject([
-      [{ name: "root" }],
-      [{ name: "b" }, { name: "c" }],
-      [{ name: "a" }],
+      [
+        {
+          packageMeta: { name: "root" },
+          dependencies: [],
+        },
+      ],
+      expect.arrayContaining([
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "b" }),
+          dependencies: [],
+        }),
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "c" }),
+          dependencies: [],
+        }),
+      ]),
+      [
+        {
+          packageMeta: { name: "a" },
+          dependencies: expect.arrayContaining([
+            expect.objectContaining({ name: "b" }),
+            expect.objectContaining({ name: "c" }),
+          ]),
+        },
+      ],
     ]);
   });
 
@@ -134,17 +179,19 @@ describe("buildPackageTree", () => {
 
     const a: PackageMeta = {
       name: "a",
-      packageJson: { dependencies: { b: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./a/package.json",
       directory: "./a/",
+      internalPackageDependencies: ["b"],
     };
     const b: PackageMeta = {
       name: "b",
-      packageJson: { dependencies: { a: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./b/package.json",
       directory: "./b/",
+      internalPackageDependencies: ["a"],
     };
 
     // ACT + ASSERT
@@ -165,24 +212,27 @@ describe("buildPackageTree", () => {
 
     const a: PackageMeta = {
       name: "a",
-      packageJson: { dependencies: { b: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./a/package.json",
       directory: "./a/",
+      internalPackageDependencies: ["b"],
     };
     const b: PackageMeta = {
       name: "b",
-      packageJson: { dependencies: { c: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./b/package.json",
       directory: "./b/",
+      internalPackageDependencies: ["c"],
     };
     const c: PackageMeta = {
       name: "c",
-      packageJson: { dependencies: { a: "*" } },
+      packageJson: {},
       isRoot: false,
       packageJsonPath: "./c/package.json",
       directory: "./c/",
+      internalPackageDependencies: ["a"],
     };
 
     // ACT + ASSERT
@@ -194,33 +244,59 @@ describe("buildPackageTree", () => {
 
 describe("executeAgainstPackageTree", () => {
   test("executes actions in the expected order", async () => {
-    const a: PackageMeta = {
-      name: "a",
-      packageJson: {},
-      isRoot: false,
-      packageJsonPath: "./a/package.json",
-      directory: "./a/",
+    // ARRANGE
+
+    /*
+    root
+    |- a(b,c,d)
+    |- b(c)
+    |- c(d)
+    |- d
+    */
+
+    const a: PackageNode = {
+      packageMeta: {
+        name: "a",
+        packageJson: {},
+        isRoot: false,
+        packageJsonPath: "./a/package.json",
+        directory: "./a/",
+        internalPackageDependencies: ["b", "c", "d"],
+      },
+      dependencies: [],
     };
-    const b: PackageMeta = {
-      name: "b",
-      packageJson: {},
-      isRoot: false,
-      packageJsonPath: "./b/package.json",
-      directory: "./b/",
+    const b: PackageNode = {
+      packageMeta: {
+        name: "b",
+        packageJson: {},
+        isRoot: false,
+        packageJsonPath: "./b/package.json",
+        directory: "./b/",
+        internalPackageDependencies: ["c"],
+      },
+      dependencies: [],
     };
-    const c: PackageMeta = {
-      name: "c",
-      packageJson: {},
-      isRoot: false,
-      packageJsonPath: "./c/package.json",
-      directory: "./c/",
+    const c: PackageNode = {
+      packageMeta: {
+        name: "c",
+        packageJson: {},
+        isRoot: false,
+        packageJsonPath: "./c/package.json",
+        directory: "./c/",
+        internalPackageDependencies: ["d"],
+      },
+      dependencies: [],
     };
-    const d: PackageMeta = {
-      name: "d",
-      packageJson: {},
-      isRoot: false,
-      packageJsonPath: "./d/package.json",
-      directory: "./d/",
+    const d: PackageNode = {
+      packageMeta: {
+        name: "d",
+        packageJson: {},
+        isRoot: false,
+        packageJsonPath: "./d/package.json",
+        directory: "./d/",
+        internalPackageDependencies: [],
+      },
+      dependencies: [],
     };
 
     const level1: PackageTreeLevel = [a];
@@ -229,15 +305,17 @@ describe("executeAgainstPackageTree", () => {
 
     const actual: string[] = [];
 
+    // ACT
     await executeAgainstPackageTree(
       [level1, level2, level3],
-      async (packageMeta) => {
-        actual.push(`start: ${packageMeta.name}`);
+      async (packageNode) => {
+        actual.push(`start: ${packageNode.packageMeta.name}`);
         await new Promise((resolve) => setTimeout(resolve, 8));
-        actual.push(`end: ${packageMeta.name}`);
+        actual.push(`end: ${packageNode.packageMeta.name}`);
       },
     );
 
+    // ASSERT
     expect(actual).toEqual([
       "start: a",
       "end: a",

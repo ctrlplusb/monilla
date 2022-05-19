@@ -7,6 +7,7 @@
   "author": "Sean Matheson",
   "license": "ISC",
   "dependencies": {
-    "@my/messages": "file:../messages"
+    "@my/logger": "*",
+    "@my/messages": "*"
   }
 }

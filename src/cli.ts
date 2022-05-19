@@ -51,7 +51,7 @@ yargs
   .command({
     command: "install",
     describe:
-      "Installs the dependencies for your packages and ensures internal packages are linked correctly",
+      "Installs the dependencies for your packages, whilst ensuring internal packages are linked correctly",
     handler: async () => {
       const cwd = process.cwd();
       const rootDirectory = await resolveRootDirectory(cwd);

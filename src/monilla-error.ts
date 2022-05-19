@@ -9,6 +9,7 @@ export enum ErrorCode {
   MissingRootPackageJSON = 3,
   SystemError = 4,
   CircularDependency = 5,
+  InvalidNPMVersion = 6,
 }
 
 const errorMessages: Record<ErrorCode, string> = {
@@ -18,6 +19,7 @@ const errorMessages: Record<ErrorCode, string> = {
   [ErrorCode.MissingRootPackageJSON]: `We could not find a package.json in your root directory. Please ensure it exists.`,
   [ErrorCode.SystemError]: `An unexpected error occurred.`,
   [ErrorCode.CircularDependency]: `There is a circular dependency between your packages.`,
+  [ErrorCode.InvalidNPMVersion]: `You have an invalid version of npm running. We require v8.8.0 or higher. Please see our docs for more information.`,
 };
 
 export function errorMessageFor(code: ErrorCode): string {

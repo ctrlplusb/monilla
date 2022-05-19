@@ -1,18 +1,33 @@
 #!/bin/env node
 
+import { spawnSync } from "child_process";
+import { satisfies } from "semver";
 import yargs from "yargs";
 
 import packageJSON from "../package.json";
-import { cliCommand } from "./constants";
+import { cliCommand, requiredMinNpmVersion } from "./constants";
+import { ErrorCode, MonillaError } from "./monilla-error";
 import {
   buildPackageTree,
   executeAgainstPackageTree,
-  linkStoreDependencies,
   resolvePackages,
+  updateInternalDependencyPathsForPackage,
 } from "./packages";
 import { resolveRootDirectory } from "./resolve-root-directory";
 import { runCommandAgainstPackage } from "./spawn";
 import { copyPackageToStore, resolveStoreDirectory } from "./store";
+
+const npmVersion =
+  spawnSync("npm", ["--version"], {
+    encoding: "utf8",
+  }).stdout?.trim() ?? "unknown";
+
+if (!satisfies(npmVersion, `>=${requiredMinNpmVersion}`)) {
+  throw new MonillaError(
+    ErrorCode.InvalidNPMVersion,
+    `We detected that you are using version "${npmVersion}"`,
+  );
+}
 
 yargs
   .usage(cliCommand + " [command] [options]")
@@ -60,7 +75,12 @@ yargs
           packagesInStore.add(dependency.name);
         }
 
-        await linkStoreDependencies(packageNode.packageMeta, storeDirectory);
+        // Then we ensure that the package.json for our package has the correct
+        // paths to our internal packages.
+        await updateInternalDependencyPathsForPackage(
+          packageNode.packageMeta,
+          storeDirectory,
+        );
 
         await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
           "install",

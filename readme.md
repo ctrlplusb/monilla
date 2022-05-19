@@ -69,7 +69,9 @@ This tool enables this "vanilla" approach. Each package owns its own dependencie
 You need the following available on your system to use this CLI;
 
 - Node.js version 16 or higher
-- npm version 8 or higher
+- npm version 8.8.0 or higher
+
+> TODO: Note about the required min npm version
 
 &nbsp;
 

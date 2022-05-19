@@ -188,7 +188,7 @@ export async function resolvePackages(
   return packageJsons;
 }
 
-export async function linkStoreDependencies(
+export async function updateInternalDependencyPathsForPackage(
   packageMeta: PackageMeta,
   storeDirectory: string,
 ): Promise<void> {
@@ -196,21 +196,44 @@ export async function linkStoreDependencies(
     cwd: packageMeta.directory,
     normalize: false,
   });
+
+  let didMutatePackageJson = false;
+
   for (const dep of packageMeta.internalPackageDependencies) {
-    const storeReference = path.relative(
+    const fileRefToDepInStore = `file:${path.relative(
       packageMeta.directory,
       path.join(storeDirectory, dep),
-    );
-    const relativeDependencyReference = `file:${storeReference}`;
-    if (packageJson.dependencies && packageJson.dependencies[dep]) {
-      packageJson.dependencies[dep] = relativeDependencyReference;
+    )}`;
+
+    if (
+      packageJson.dependencies &&
+      packageJson.dependencies[dep] &&
+      packageJson.dependencies[dep] !== fileRefToDepInStore
+    ) {
+      packageJson.dependencies[dep] = fileRefToDepInStore;
+      didMutatePackageJson = true;
     }
-    if (packageJson.devDependencies && packageJson.devDependencies[dep]) {
-      packageJson.devDependencies[dep] = relativeDependencyReference;
+
+    if (
+      packageJson.devDependencies &&
+      packageJson.devDependencies[dep] &&
+      packageJson.devDependencies[dep] !== fileRefToDepInStore
+    ) {
+      packageJson.devDependencies[dep] = fileRefToDepInStore;
+      didMutatePackageJson = true;
     }
-    if (packageJson.peerDependencies && packageJson.peerDependencies[dep]) {
-      packageJson.peerDependencies[dep] = relativeDependencyReference;
+
+    if (
+      packageJson.peerDependencies &&
+      packageJson.peerDependencies[dep] &&
+      packageJson.peerDependencies[dep] !== fileRefToDepInStore
+    ) {
+      packageJson.peerDependencies[dep] = fileRefToDepInStore;
+      didMutatePackageJson = true;
     }
+  }
+
+  if (didMutatePackageJson) {
     await writePackage(packageMeta.directory, packageJson as any, {
       normalize: false,
     });

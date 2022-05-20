@@ -91,4 +91,12 @@ yargs
       });
     },
   })
+  .command({
+    command: "link",
+    describe: "Links the dependencies for your packages",
+    builder: (args) => {
+      return args.string("from");
+    },
+    handler: async (args) => {},
+  })
   .help("help").argv;

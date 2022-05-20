@@ -11,9 +11,11 @@ Manage the dependencies within your Node.js based monorepo\* in a vanilla-esque 
 &nbsp;
 
 - [1. Introduction](#1-introduction)
-- [2. Trade Offs and Limitations](#2-trade-offs-and-limitations)
-- [3. Requirements](#3-requirements)
-- [4. Installation](#4-installation)
+- [2. Limitations](#2-limitations)
+- [3. Prerequisites](#3-prerequisites)
+  - [3.2. Installing the required Node.js version](#32-installing-the-required-nodejs-version)
+  - [3.1. Upgrading your npm to the required version](#31-upgrading-your-npm-to-the-required-version)
+- [4. Installation and Configuration](#4-installation-and-configuration)
 - [5. Guide](#5-guide)
   - [5.1. Initialising your dependencies](#51-initialising-your-dependencies)
   - [5.2. Linking and Unlinking packages](#52-linking-and-unlinking-packages)
@@ -32,52 +34,75 @@ Manage the dependencies within your Node.js based monorepo\* in a vanilla-esque 
 
 This is a CLI tool that aids in managing the dependencies and cross package references within your Node.js based [monorepo](https://monorepo.tools).
 
-It does this **without** the use of workspaces or hoisting, and intentionally attempts to manage your dependencies with as close to a vanilla npm experience as we can.
+It does this **without** the use of workspaces or hoisting. We manage the dependencies, for each package within your monorepo, utilising as close to a vanilla npm experience as we can achieve.
 
-Workspaces/hoisting tend to work well for a while, but inevitably a difficult to resolve bug will appear. The solution to which tends to require a tedious and careful debugging process along with configuration magic in order to unblock progress. We want to achieve a monorepo experience where each package feels as stable as if a simple `npm install` against each package.
+This means there is more duplication of dependencies across your packages, but we feel that there is an increased predictability, as well as a reduction in risk of dealing with complex dependency resolution bugs that were created due to dependency hoisting.
 
-This tool enables this "vanilla" approach. Each package owns its own dependencies, with a standard `npm install` being coordinated against them. Cross package dependencies are enabled by utilising a sound process proved by the amazing [Yalc](https://github.com/wclr/yalc) tool.
+We lean heavily into a "standard" npm experience and promote the capability for packages to be easily lifted in or out of your monorepo.
+
+Each package owns its own dependencies, with a standard `npm install` being coordinated against them. Cross package dependencies are enabled by utilising a similar approach proved by the [Yalc CLI](https://github.com/wclr/yalc).
 
 &nbsp;
 
 ---
 
-## 2. Trade Offs and Limitations
+## 2. Limitations
+
+- **Only supports Node.js >= 16 and npm >= 8.8.0**
+
+  Specialising against these allows us to provide stronger guarantees, whilst also unlocking critical features which allowed us to achieve our goals.
 
 - **Disk space**
 
-  Yeah, you'll use more of it with our approach, comparing it to the hoisting or symlinking strategies adopted by some package managers. Honestly, we are happy to sacrifice a few megabytes in exchange for sanity. Your call.
+  You will likely use more of it with our approach, comparing it to the hoisting or symlinking strategies adopted by some package managers.
 
-- **Workspace features**
+  This trade off is intentional, sacrificing a few megabytes in exchange for sanity felt like a fair exchange.
 
-  npm/Yarn workspaces provide a lot of additional features, such as command delegation into specific packages within a monorepo. We do not have equivalents for these features, wishing to focus on the problem of dependency management specifically.
+- **Does not support package publishing**
 
-- **Publishing**
-
-  This tool is currently designed with private packages in mind. We haven't considered workflows for packages that require to be published to a registry.
-
-- **Only supports Node.js and npm based packages**
-
-  Specialising against these allows us to provide stronger guarantees.
+  This tool is currently designed to work against private packages. We haven't considered workflows for packages that require to be published to a registry. We would be open to community feedback in this matter.
 
 &nbsp;
 
 ---
 
-## 3. Requirements
+## 3. Prerequisites
 
 You need the following available on your system to use this CLI;
 
-- Node.js version 16 or higher
-- npm version 8.8.0 or higher
+- **Node.js** version `16.13.0` or higher
 
-> TODO: Note about the required min npm version
+- **npm** version `8.8.0` or higher
+
+  **Important:** Currently version `8.5.5` ships the most recent LTS of Node.js. See the note below to address this.
+
+### 3.2. Installing the required Node.js version
+
+We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which allows you to install and switch between multiple versions of Node.js seamlessly.
+
+Once you have it installed you can install the latest version of the Node.js LTS via the following command;
+
+```bash
+nvm install --lts --default 16
+```
+
+This will install the latest LTS version of the major version 16 of Node.js, whilst also making it the default Node.js version that will be used on your machine.
+
+### 3.1. Upgrading your npm to the required version
+
+The most recent LTS of Node.js (version `16.15.0` at the time of writing) currently ships with npm version `8.5.5`. For us to support internal package references across your monorepo. We specifically depend on the [`--install-links`](https://docs.npmjs.com/cli/v8/commands/npm-install#install-links) flag which was introduced in npm version `8.8.0`.
+
+You can get the required version running on your machine by upgrading it like so;
+
+```bash
+npm install -g npm@8
+```
 
 &nbsp;
 
 ---
 
-## 4. Installation
+## 4. Installation and Configuration
 
 Run the following command at the root of your monorepo;
 

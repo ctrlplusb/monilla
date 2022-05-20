@@ -400,7 +400,10 @@ describe("resolvePackages", () => {
           },
         },
         isRoot: false,
-        internalPackageDependencies: ["@my/logger", "@my/messages"],
+        internalPackageDependencies: expect.arrayContaining([
+          "@my/logger",
+          "@my/messages",
+        ]),
       },
       {
         name: "example-monorepo",

@@ -21,6 +21,7 @@
   "scripts": {
     "build": "tsup-node src/cli.ts --sourcemap inline --format cjs --legacy-output",
     "lint": "eslint . --ext .js,.ts,.json",
+    "prepublish": "npm run build",
     "test": "jest",
     "typecheck": "tsc"
   },

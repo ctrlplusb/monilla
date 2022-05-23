@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 
 import { spawnSync } from "child_process";
 import { satisfies } from "semver";

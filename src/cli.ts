@@ -49,9 +49,17 @@ yargs
     },
   })
   .command({
+    command: "init",
+    describe:
+      "Initializes Monilla into your project, adding the required configuration",
+    handler: () => {
+      throw new MonillaError(ErrorCode.NotImplemented);
+    },
+  })
+  .command({
     command: "install",
     describe:
-      "Installs the dependencies for your packages, whilst ensuring internal packages are linked correctly",
+      "Installs the dependencies across your monorepo, whilst also ensuring internal package dependencies linked correctly.",
     handler: async () => {
       const cwd = process.cwd();
       const rootDirectory = await resolveRootDirectory(cwd);
@@ -66,7 +74,17 @@ yargs
         // copied to the shared store.
         for (const dependency of packageNode.dependencies) {
           if (packagesInStore.has(dependency.name)) {
+            // This dependency has already been copied to the store within this
+            // CLI execution, therefore we will continue to the next dependency.
             continue;
+          }
+          // This package has a build command, therefore we will execute it
+          // to ensure we have all the required files available prior to
+          // attempting to copy the package to the monilla store.
+          if (dependency.packageJson.scripts?.build != null) {
+            await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
+              "build",
+            ]);
           }
           await copyPackageToStore({
             packageDirectory: dependency.directory,
@@ -97,6 +115,8 @@ yargs
     builder: (args) => {
       return args.string("from");
     },
-    handler: async (args) => {},
+    handler: async () => {
+      throw new MonillaError(ErrorCode.NotImplemented);
+    },
   })
   .help("help").argv;

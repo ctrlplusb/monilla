@@ -10,6 +10,7 @@ export enum ErrorCode {
   SystemError = 4,
   CircularDependency = 5,
   InvalidNPMVersion = 6,
+  NotImplemented = 7,
 }
 
 const errorMessages: Record<ErrorCode, string> = {
@@ -20,6 +21,7 @@ const errorMessages: Record<ErrorCode, string> = {
   [ErrorCode.SystemError]: `An unexpected error occurred.`,
   [ErrorCode.CircularDependency]: `There is a circular dependency between your packages.`,
   [ErrorCode.InvalidNPMVersion]: `You have an invalid version of npm running. We require v8.8.0 or higher. Please see our docs for more information.`,
+  [ErrorCode.NotImplemented]: `Apologies, this feature is not yet implemented. Monilla is still a work in progress. Please check in via the GitHub discussions if something is important to you.`,
 };
 
 export function errorMessageFor(code: ErrorCode): string {

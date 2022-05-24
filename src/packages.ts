@@ -2,7 +2,7 @@ import { globby } from "globby";
 import pSeries from "p-series";
 import path, { dirname } from "path";
 import { readPackage } from "read-pkg";
-import { PackageJson } from "type-fest";
+import { JsonObject, PackageJson } from "type-fest";
 import { writePackage } from "write-pkg";
 
 import { ErrorCode, MonillaError } from "./monilla-error";
@@ -234,7 +234,7 @@ export async function updateInternalDependencyPathsForPackage(
   }
 
   if (didMutatePackageJson) {
-    await writePackage(packageMeta.directory, packageJson as any, {
+    await writePackage(packageMeta.directory, packageJson as JsonObject, {
       normalize: false,
     });
   }

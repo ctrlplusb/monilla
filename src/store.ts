@@ -1,5 +1,13 @@
 import crypto from "crypto";
-import fs, { mkdir, pathExists } from "fs-extra";
+import {
+  copy,
+  createReadStream,
+  mkdir,
+  pathExists,
+  readFile,
+  remove,
+  writeFile,
+} from "fs-extra";
 import npmPacklist from "npm-packlist";
 import path from "path";
 import { NormalizedPackageJson, readPackage } from "read-pkg";
@@ -28,7 +36,7 @@ const fixScopedRelativeName = (path: string) => path.replace(/^\.\//, "");
 
 const getFileHash = (srcPath: string, relPath = "") => {
   return new Promise<string>((resolve, reject) => {
-    const stream = fs.createReadStream(srcPath);
+    const stream = createReadStream(srcPath);
     const md5sum = crypto.createHash("md5");
     md5sum.update(relPath.replace(/\\/g, "/"));
     stream.on("data", (data: string) => md5sum.update(data));
@@ -43,7 +51,7 @@ const copyFile = async (
   destPath: string,
   relativePath = "",
 ) => {
-  await fs.copy(srcPath, destPath);
+  await copy(srcPath, destPath);
   return getFileHash(srcPath, relativePath);
 };
 
@@ -53,9 +61,9 @@ const readSignatureFile = async (
   workingDir: string,
 ): Promise<Signature | undefined> => {
   const signatureFilePath = path.join(workingDir, signatureFileName);
-  if (await fs.pathExists(signatureFilePath)) {
+  if (await pathExists(signatureFilePath)) {
     try {
-      const fileData = await fs.readFile(signatureFilePath, "utf-8");
+      const fileData = await readFile(signatureFilePath, "utf-8");
       return fileData;
     } catch (e) {
       // TODO: Replace with MonillaError
@@ -72,7 +80,7 @@ const writeSignatureFile = async (
 ): Promise<void> => {
   const signatureFilePath = path.join(workingDir, signatureFileName);
   try {
-    await fs.writeFile(signatureFilePath, signature, "utf-8");
+    await writeFile(signatureFilePath, signature, "utf-8");
   } catch (e) {
     // TODO: Replace with MonillaError
     console.error("Could not write signature file");
@@ -142,7 +150,7 @@ export const copyPackageToStore = async (options: {
     return signature;
   } else {
     // Copy the files to the store
-    await fs.remove(packageDirectoryInStore);
+    await remove(packageDirectoryInStore);
     await Promise.all(
       filesToCopy
         .sort()

@@ -1,4 +1,4 @@
-import { readFile } from "fs-extra";
+import * as fs from "fs-extra";
 import path from "path";
 import * as z from "zod";
 
@@ -9,7 +9,7 @@ import { resolveRootDirectory } from "./resolve-root-directory";
 export async function resolveConfig(workingDirectory: string): Promise<string> {
   const rootDirectory = await resolveRootDirectory(workingDirectory);
   const configFilePath = path.join(rootDirectory, configFileName);
-  const contents = readFile(configFilePath, "utf-8");
+  const contents = fs.readFile(configFilePath, "utf-8");
   return contents;
 }
 

@@ -1,13 +1,5 @@
 import crypto from "crypto";
-import {
-  copy,
-  createReadStream,
-  mkdir,
-  pathExists,
-  readFile,
-  remove,
-  writeFile,
-} from "fs-extra";
+import * as fs from "fs-extra";
 import npmPacklist from "npm-packlist";
 import path from "path";
 import { NormalizedPackageJson, readPackage } from "read-pkg";
@@ -25,8 +17,8 @@ export async function resolveStoreDirectory(workingDirectory: string) {
     "node_modules",
   );
 
-  if (!(await pathExists(storeDirectory))) {
-    await mkdir(storeDirectory, { recursive: true });
+  if (!(await fs.pathExists(storeDirectory))) {
+    await fs.mkdir(storeDirectory, { recursive: true });
   }
 
   return storeDirectory;
@@ -36,7 +28,7 @@ const fixScopedRelativeName = (path: string) => path.replace(/^\.\//, "");
 
 const getFileHash = (srcPath: string, relPath = "") => {
   return new Promise<string>((resolve, reject) => {
-    const stream = createReadStream(srcPath);
+    const stream = fs.createReadStream(srcPath);
     const md5sum = crypto.createHash("md5");
     md5sum.update(relPath.replace(/\\/g, "/"));
     stream.on("data", (data: string) => md5sum.update(data));
@@ -51,7 +43,7 @@ const copyFile = async (
   destPath: string,
   relativePath = "",
 ) => {
-  await copy(srcPath, destPath);
+  await fs.copy(srcPath, destPath);
   return getFileHash(srcPath, relativePath);
 };
 
@@ -61,9 +53,9 @@ const readSignatureFile = async (
   workingDir: string,
 ): Promise<Signature | undefined> => {
   const signatureFilePath = path.join(workingDir, signatureFileName);
-  if (await pathExists(signatureFilePath)) {
+  if (await fs.pathExists(signatureFilePath)) {
     try {
-      const fileData = await readFile(signatureFilePath, "utf-8");
+      const fileData = await fs.readFile(signatureFilePath, "utf-8");
       return fileData;
     } catch (e) {
       // TODO: Replace with MonillaError
@@ -80,7 +72,7 @@ const writeSignatureFile = async (
 ): Promise<void> => {
   const signatureFilePath = path.join(workingDir, signatureFileName);
   try {
-    await writeFile(signatureFilePath, signature, "utf-8");
+    await fs.writeFile(signatureFilePath, signature, "utf-8");
   } catch (e) {
     // TODO: Replace with MonillaError
     console.error("Could not write signature file");
@@ -150,7 +142,7 @@ export const copyPackageToStore = async (options: {
     return signature;
   } else {
     // Copy the files to the store
-    await remove(packageDirectoryInStore);
+    await fs.remove(packageDirectoryInStore);
     await Promise.all(
       filesToCopy
         .sort()

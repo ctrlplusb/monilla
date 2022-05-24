@@ -26,8 +26,8 @@ yargs(hideBin(process.argv))
   .usage(cliCommand + " [command] [options]")
   .command({
     command: "*",
-    builder: () => {
-      return yargs.boolean(["version"]);
+    builder: (args) => {
+      return args.boolean(["version"]);
     },
     handler: (argv) => {
       let msg = "Use `monilla help` to see available commands.";

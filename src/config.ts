@@ -1,6 +1,6 @@
-import * as fs from "fs-extra";
+import fs from "fs-extra";
 import path from "path";
-import * as z from "zod";
+import z from "zod";
 
 import { configFileName } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";

@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import * as fs from "fs-extra";
+import fs from "fs-extra";
 import npmPacklist from "npm-packlist";
 import path from "path";
 import { NormalizedPackageJson, readPackage } from "read-pkg";

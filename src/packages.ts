@@ -139,11 +139,13 @@ export async function resolvePackages(
     },
   );
 
-  const packages = packageJsonPaths.reduce<
-    Record<string, { packageJsonPath: string; packageJson: PackageJson }>
-  >((acc, packageJsonPath) => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const packageJson: PackageJson = require(packageJsonPath);
+  const packages: Record<
+    string,
+    { packageJsonPath: string; packageJson: PackageJson }
+  > = {};
+
+  for (const packageJsonPath of packageJsonPaths) {
+    const packageJson: PackageJson = (await import(packageJsonPath)).default;
 
     if (packageJson.name == null || packageJson.name.trim().length === 0) {
       throw new MonillaError(
@@ -152,13 +154,11 @@ export async function resolvePackages(
       );
     }
 
-    acc[packageJson.name] = {
+    packages[packageJson.name] = {
       packageJsonPath,
       packageJson,
     };
-
-    return acc;
-  }, {});
+  }
 
   const packageNames = Object.keys(packages);
 

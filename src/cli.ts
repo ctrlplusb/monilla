@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "child_process";
-import * as semver from "semver";
+import semver from "semver";
 import yargs from "yargs";
 
 import packageJSON from "../package.json";

@@ -2,7 +2,7 @@
 
 import { spawnSync } from "child_process";
 import semver from "semver";
-import yargs from "yargs";
+import * as yargs from "yargs";
 
 import packageJSON from "../package.json";
 import { install } from "./actions";

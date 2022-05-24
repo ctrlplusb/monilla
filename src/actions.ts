@@ -30,9 +30,7 @@ export async function install(workingDirectory: string): Promise<void> {
       // to ensure we have all the required files available prior to
       // attempting to copy the package to the monilla store.
       if (dependency.packageJson.scripts?.build != null) {
-        await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
-          "build",
-        ]);
+        await runCommandAgainstPackage(dependency, "npm", ["build"]);
       }
       await copyPackageToStore({
         packageDirectory: dependency.directory,

@@ -1,6 +1,6 @@
 {
   "name": "monilla",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Manage your monorepo dependencies in a vanilla-esque manner.",
   "homepage": "https://github.com/ctrlplusb/monilla",
   "engines": {

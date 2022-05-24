@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "child_process";
-import { satisfies } from "semver";
+import * as semver from "semver";
 import yargs from "yargs";
 
 import packageJSON from "../package.json";
@@ -14,7 +14,7 @@ const npmVersion =
     encoding: "utf8",
   }).stdout?.trim() ?? "unknown";
 
-if (!satisfies(npmVersion, `>=${requiredMinNpmVersion}`)) {
+if (!semver.satisfies(npmVersion, `>=${requiredMinNpmVersion}`)) {
   throw new MonillaError(
     ErrorCode.InvalidNPMVersion,
     `We detected that you are using version "${npmVersion}"`,

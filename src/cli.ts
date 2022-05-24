@@ -2,7 +2,8 @@
 
 import { spawnSync } from "child_process";
 import semver from "semver";
-import * as yargs from "yargs";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 import packageJSON from "../package.json";
 import { install } from "./actions";
@@ -21,7 +22,7 @@ if (!semver.satisfies(npmVersion, `>=${requiredMinNpmVersion}`)) {
   );
 }
 
-yargs
+yargs(hideBin(process.argv))
   .usage(cliCommand + " [command] [options]")
   .command({
     command: "*",

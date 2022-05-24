@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "description": "Manage your monorepo dependencies in a vanilla-esque manner.",
   "homepage": "https://github.com/ctrlplusb/monilla",
-  "type": "module",
+  "type": "commonjs",
   "engines": {
     "node": ">=16.13.0",
     "npm": ">=8.8.0"
@@ -20,7 +20,7 @@
     "monilla": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsup-node src/cli.ts --sourcemap inline --format esm,cjs --target node16",
+    "build": "tsup-node src/cli.ts --sourcemap inline --format cjs --target node16",
     "lint": "eslint . --ext .js,.ts,.json",
     "prepare": "npm run build",
     "test": "vitest",

@@ -1,7 +1,8 @@
 import path from "path";
-import tempy from "tempy";
+import { temporaryDirectory } from "tempy";
+import { describe, expect, test } from "vitest";
 
-import { ErrorCode, errorMessageFor } from "~/monilla-error";
+import { ErrorCode, errorMessageFor } from "../src/monilla-error";
 import {
   buildPackageTree,
   executeAgainstPackageTree,
@@ -9,7 +10,7 @@ import {
   PackageNode,
   PackageTreeLevel,
   resolvePackages,
-} from "~/packages";
+} from "../src/packages";
 
 describe("buildPackageTree", () => {
   const root: PackageMeta = {
@@ -332,13 +333,13 @@ describe("executeAgainstPackageTree", () => {
 });
 
 describe("resolvePackages", () => {
-  it("should return an empty array if no packages are found", async () => {
-    const actual = await resolvePackages(tempy.directory());
+  test("should return an empty array if no packages are found", async () => {
+    const actual = await resolvePackages(temporaryDirectory());
 
     expect(actual).toEqual([]);
   });
 
-  it("[integration] should resolve the expected packages", async () => {
+  test("[integration] should resolve the expected packages", async () => {
     const workingDirectory = path.join(
       __dirname,
       "__fixtures__/simple-monorepo",

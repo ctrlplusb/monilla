@@ -1,22 +1,23 @@
 import fs from "fs";
 import path from "path";
-import tempy from "tempy";
+import { temporaryDirectory } from "tempy";
+import { describe, expect, test } from "vitest";
 
-import { parseConfig, resolveConfig } from "~/config";
-import { configFileName } from "~/constants";
-import { ErrorCode, errorMessageFor } from "~/monilla-error";
+import { parseConfig, resolveConfig } from "../src/config";
+import { configFileName } from "../src/constants";
+import { ErrorCode, errorMessageFor } from "../src/monilla-error";
 
 describe("resolve-config", () => {
-  it("should throw when no config file exists", async () => {
-    await expect(() => resolveConfig(tempy.directory())).rejects.toThrow(
+  test("should throw when no config file exists", async () => {
+    await expect(() => resolveConfig(temporaryDirectory())).rejects.toThrow(
       errorMessageFor(ErrorCode.MissingConfigFile),
     );
   });
 
-  it("should return the config file contents", async () => {
+  test("should return the config file contents", async () => {
     // ARRANGE
     const expected = '{ "verbose": false }';
-    const workingDirectory = tempy.directory();
+    const workingDirectory = temporaryDirectory();
     fs.writeFileSync(path.join(workingDirectory, configFileName), expected, {
       encoding: "utf-8",
     });
@@ -30,7 +31,7 @@ describe("resolve-config", () => {
 });
 
 describe("parse-config", () => {
-  it("should throw if config does not match the expected schema", () => {
+  test("should throw if config does not match the expected schema", () => {
     expect(() => parseConfig(__dirname)).toThrow(Error);
   });
 });

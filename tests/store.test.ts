@@ -4,9 +4,10 @@ import {
   removeSync as remove,
 } from "fs-extra";
 import path from "path";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 
-import { signatureFileName } from "~/constants";
-import { copyPackageToStore } from "~/store";
+import { signatureFileName } from "../src/constants";
+import { copyPackageToStore } from "../src/store";
 
 describe("copyPackageToStore", () => {
   let storeDirectory: string;

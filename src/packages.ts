@@ -1,9 +1,9 @@
-import globby from "globby";
+import { globby } from "globby";
 import pSeries from "p-series";
 import path, { dirname } from "path";
-import readPkg from "read-pkg";
+import { readPackage } from "read-pkg";
 import { PackageJson } from "type-fest";
-import writePackage from "write-pkg";
+import { writePackage } from "write-pkg";
 
 import { ErrorCode, MonillaError } from "./monilla-error";
 
@@ -192,7 +192,7 @@ export async function updateInternalDependencyPathsForPackage(
   packageMeta: PackageMeta,
   storeDirectory: string,
 ): Promise<void> {
-  const packageJson = await readPkg({
+  const packageJson = await readPackage({
     cwd: packageMeta.directory,
     normalize: false,
   });

@@ -1,6 +1,6 @@
 import { CustomError } from "ts-custom-error";
 
-import { configFileName } from "~/constants";
+import { configFileName } from "./constants";
 
 export enum ErrorCode {
   MissingConfigFile = 0,

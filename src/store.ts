@@ -2,7 +2,7 @@ import crypto from "crypto";
 import fs, { mkdir, pathExists } from "fs-extra";
 import npmPacklist from "npm-packlist";
 import path from "path";
-import readPkg, { NormalizedPackageJson } from "read-pkg";
+import { NormalizedPackageJson, readPackage } from "read-pkg";
 
 import { monillaDirectoryName, signatureFileName } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";
@@ -83,7 +83,7 @@ const writeSignatureFile = async (
 const readPackageJson = async (
   workingDir: string,
 ): Promise<NormalizedPackageJson> => {
-  const pkg = await readPkg({ cwd: workingDir });
+  const pkg = await readPackage({ cwd: workingDir });
   if (!pkg) {
     throw new MonillaError(
       ErrorCode.SystemError,

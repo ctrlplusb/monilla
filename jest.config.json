@@ -1,8 +1,0 @@
-{
-  "preset": "ts-jest",
-  "testEnvironment": "node",
-  "moduleFileExtensions": ["ts", "tsx", "js", "json"],
-  "moduleNameMapper": {
-    "~/(.*)": "<rootDir>/src/$1"
-  }
-}

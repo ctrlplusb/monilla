@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "description": "Manage your monorepo dependencies in a vanilla-esque manner.",
   "homepage": "https://github.com/ctrlplusb/monilla",
+  "type": "module",
   "engines": {
     "node": ">=16.13.0",
     "npm": ">=8.8.0"
@@ -19,10 +20,10 @@
     "monilla": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsup-node src/cli.ts --sourcemap inline --format cjs --legacy-output",
+    "build": "tsup-node src/cli.ts --sourcemap inline --format esm,cjs --target node16",
     "lint": "eslint . --ext .js,.ts,.json",
     "prepare": "npm run build",
-    "test": "jest",
+    "test": "vitest",
     "typecheck": "tsc"
   },
   "keywords": [
@@ -36,61 +37,57 @@
   "license": "MIT",
   "dependencies": {
     "child-process-toolbox": "^3.0.4",
-    "find-up": "^5.0.0",
+    "find-up": "^6.3.0",
     "fs-extra": "^10.1.0",
-    "globby": "^11.1.0",
+    "globby": "^13.1.1",
     "npm-packlist": "^5.0.4",
-    "p-series": "^2.1.0",
-    "read-pkg": "^5.2.0",
+    "p-series": "^3.0.0",
+    "read-pkg": "^7.1.0",
     "semver": "^7.3.7",
     "ts-custom-error": "^3.2.0",
     "type-fest": "^2.12.2",
-    "write-pkg": "^4.0.0",
+    "write-pkg": "^5.1.0",
     "yargs": "^17.5.1",
-    "zod": "^3.16.0"
+    "zod": "^3.17.3"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
-    "@types/jest": "^27.5.1",
     "@types/node": "^16.11.35",
     "@types/npm-packlist": "^3.0.0",
     "@types/semver": "^7.3.9",
-    "@typescript-eslint/eslint-plugin": "^5.25.0",
-    "@typescript-eslint/parser": "^5.25.0",
-    "eslint": "^8.15.0",
+    "@types/yargs": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jest": "^26.2.2",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "jest": "^28.1.0",
     "prettier": "^2.6.2",
-    "tempy": "^1.0.1",
-    "ts-jest": "^28.0.2",
+    "tempy": "^3.0.0",
     "tsup": "^5.12.8",
-    "typescript": "^4.6.4"
+    "typescript": "^4.7.0-beta",
+    "vitest": "^0.12.9"
   },
   "eslintConfig": {
     "root": true,
     "parser": "@typescript-eslint/parser",
     "plugins": [
       "@typescript-eslint",
-      "jest",
       "simple-import-sort",
       "prettier"
     ],
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
-      "plugin:jest/recommended",
       "plugin:import/recommended",
       "plugin:import/typescript",
       "plugin:prettier/recommended"
     ],
     "env": {
-      "node": true,
-      "jest": true
+      "es2021": true,
+      "node": true
     },
     "settings": {
       "import/resolver": {

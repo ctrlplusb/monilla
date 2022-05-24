@@ -145,7 +145,9 @@ export async function resolvePackages(
   > = {};
 
   for (const packageJsonPath of packageJsonPaths) {
-    const packageJson: PackageJson = (await import(packageJsonPath)).default;
+    const packageJson: PackageJson = (
+      await import(packageJsonPath, { assert: { type: "json" } })
+    ).default;
 
     if (packageJson.name == null || packageJson.name.trim().length === 0) {
       throw new MonillaError(

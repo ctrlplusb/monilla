@@ -11,20 +11,21 @@ Manage the dependencies within your Node.js based monorepo\* in a vanilla-esque 
 &nbsp;
 
 - [1. Introduction](#1-introduction)
-- [2. Limitations](#2-limitations)
-- [3. Prerequisites](#3-prerequisites)
-  - [3.2. Installing the required Node.js version](#32-installing-the-required-nodejs-version)
-  - [3.1. Upgrading your npm to the required version](#31-upgrading-your-npm-to-the-required-version)
-- [4. Installation and Configuration](#4-installation-and-configuration)
-- [5. Guide](#5-guide)
-  - [5.1. Initialising your dependencies](#51-initialising-your-dependencies)
-  - [5.2. Linking and Unlinking packages](#52-linking-and-unlinking-packages)
-  - [5.3. Making updates to your linked packages](#53-making-updates-to-your-linked-packages)
-  - [5.4. Watching updates to your linked packages](#54-watching-updates-to-your-linked-packages)
-  - [5.5. Performing an interactive update of dependencies across all packages](#55-performing-an-interactive-update-of-dependencies-across-all-packages)
-- [6. CLI Reference](#6-cli-reference)
-- [7. Appreciation](#7-appreciation)
-- [8. Further Reading / References](#8-further-reading--references)
+- [2. Goals](#2-goals)
+- [3. Limitations](#3-limitations)
+- [4. Prerequisites](#4-prerequisites)
+  - [4.1. Installing the required Node.js version](#41-installing-the-required-nodejs-version)
+  - [4.2. Upgrading your npm to the required version](#42-upgrading-your-npm-to-the-required-version)
+- [5. Installation and Configuration](#5-installation-and-configuration)
+- [6. Guide](#6-guide)
+  - [6.1. Initialising your dependencies](#61-initialising-your-dependencies)
+  - [6.2. Linking and Unlinking packages](#62-linking-and-unlinking-packages)
+  - [6.3. Making updates to your linked packages](#63-making-updates-to-your-linked-packages)
+  - [6.4. Watching updates to your linked packages](#64-watching-updates-to-your-linked-packages)
+  - [6.5. Performing an interactive update of dependencies across all packages](#65-performing-an-interactive-update-of-dependencies-across-all-packages)
+- [7. CLI Reference](#7-cli-reference)
+- [8. Appreciation](#8-appreciation)
+- [9. Further Reading / References](#9-further-reading--references)
 
 &nbsp;
 
@@ -32,11 +33,9 @@ Manage the dependencies within your Node.js based monorepo\* in a vanilla-esque 
 
 ## 1. Introduction
 
-This is a CLI tool that aids in managing the dependencies and cross package references within your Node.js based [monorepo](https://monorepo.tools).
+Monilla is CLI tool which enables the development of clean Node.js based [monorepos](https://monorepo.tools).
 
-It does this **without** the use of workspaces or hoisting. We manage the dependencies, for each package within your monorepo, utilising as close to a vanilla npm experience as we can achieve.
-
-This means there is more duplication of dependencies across your packages, but we feel that there is an increased predictability, as well as a reduction in risk of dealing with complex dependency resolution bugs that were created due to dependency hoisting.
+It does this **without** the use of workspaces or hoisting. Instead, it treats each of your monorepo packages as though they were independent packages. This results in more copies of 3rd party dependencies installed across your packages, however, it also promotes increased predictability within the scope of each of your packages. Dependency updates to one package should not affect another.
 
 We lean heavily into a "standard" npm experience and promote the capability for packages to be easily lifted in or out of your monorepo.
 
@@ -46,7 +45,21 @@ Each package owns its own dependencies, with a standard `npm install` being coor
 
 ---
 
-## 2. Limitations
+## 2. Goals
+
+- Leverage standard `npm` as far as possible.
+
+  At any time you should be able to stop using `monilla` and just run standard `npm` commands. Yes, you might have to execute a lot of `npm` commands depending on how many packages are in your project, but you'll be able to do so at the least.
+
+- Each package should be as though it were an independent `npm` package.
+
+  We expect that each package within your monorepo is built almost as if it were independent. It's own package.json scripts, dependencies, etc. This should allow for cleaner publishing of packages to an `npm` registry, whilst also enabling lifting and shifting of packages in or out of your monorepo.
+
+&nbsp;
+
+---
+
+## 3. Limitations
 
 - **Only supports Node.js >= 16 and npm >= 8.8.0**
 
@@ -66,7 +79,7 @@ Each package owns its own dependencies, with a standard `npm install` being coor
 
 ---
 
-## 3. Prerequisites
+## 4. Prerequisites
 
 You need the following available on your system to use this CLI;
 
@@ -76,7 +89,7 @@ You need the following available on your system to use this CLI;
 
   **Important:** Currently version `8.5.5` ships the most recent LTS of Node.js. See the note below to address this.
 
-### 3.2. Installing the required Node.js version
+### 4.1. Installing the required Node.js version
 
 We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which allows you to install and switch between multiple versions of Node.js seamlessly.
 
@@ -88,7 +101,7 @@ nvm install --lts --default 16
 
 This will install the latest LTS version of the major version 16 of Node.js, whilst also making it the default Node.js version that will be used on your machine.
 
-### 3.1. Upgrading your npm to the required version
+### 4.2. Upgrading your npm to the required version
 
 The most recent LTS of Node.js (version `16.15.0` at the time of writing) currently ships with npm version `8.5.5`. For us to support internal package references across your monorepo. We specifically depend on the [`--install-links`](https://docs.npmjs.com/cli/v8/commands/npm-install#install-links) flag which was introduced in npm version `8.8.0`.
 
@@ -102,7 +115,7 @@ npm install -g npm@8
 
 ---
 
-## 4. Installation and Configuration
+## 5. Installation and Configuration
 
 Run the following command at the root of your monorepo;
 
@@ -122,7 +135,7 @@ This will create a `.monilla.json` configuration file (if it does not yet exists
 
 ---
 
-## 5. Guide
+## 6. Guide
 
 Imagine a monorepo with the following structure:
 
@@ -152,7 +165,7 @@ Using this as a reference, we'll describe a few scenarios below.
 
 &nbsp;
 
-### 5.1. Initialising your dependencies
+### 6.1. Initialising your dependencies
 
 If you are performing a fresh clone of a repository, or switching branched, then we recommend you run the following command;
 
@@ -167,7 +180,7 @@ This performs two functions;
 
 &nbsp;
 
-### 5.2. Linking and Unlinking packages
+### 6.2. Linking and Unlinking packages
 
 The example monorepo contains a mobile app, and a components library. If we wished to utilise the components library within the mobile app we can link the package.
 
@@ -189,7 +202,7 @@ npx monilla unlink @my/components --from @my/mobile-app
 
 &nbsp;
 
-### 5.3. Making updates to your linked packages
+### 6.3. Making updates to your linked packages
 
 If you've performed updates to one of your linked packages, you can ensure that all dependants are using the latest version via the following command;
 
@@ -201,7 +214,7 @@ npx monilla refresh
 
 &nbsp;
 
-### 5.4. Watching updates to your linked packages
+### 6.4. Watching updates to your linked packages
 
 To watch for changes to your packages, resulting in automatic building and refreshing of the packages, execute the following command;
 
@@ -213,7 +226,7 @@ npx monilla watch
 
 &nbsp;
 
-### 5.5. Performing an interactive update of dependencies across all packages
+### 6.5. Performing an interactive update of dependencies across all packages
 
 To perform an interactive update of the dependencies for all of the packages within your monorepo execute the following command;
 
@@ -227,7 +240,7 @@ You'll be asked which packages you'd like to update for each of the packages wit
 
 ---
 
-## 6. CLI Reference
+## 7. CLI Reference
 
 You can get help by running the following command;
 
@@ -239,7 +252,7 @@ npx monilla --help
 
 ---
 
-## 7. Appreciation
+## 8. Appreciation
 
 Huge love and thanks goes to [@wclr](https://github.com/wclr) for the outstanding work on [Yalc](https://github.com/wclr/yalc). The Yalc workflow is the specific seed that was required to make the idea for this tool grow. We've also taken direct code and inspiration from the Yalc source, albeit modified to suit our specific use case.
 
@@ -249,7 +262,7 @@ Another shoutout of hugs goes to [@raineorshine](https://github.com/raineorshine
 
 ---
 
-## 8. Further Reading / References
+## 9. Further Reading / References
 
 - [monorepo.tools - Everything you need to know about monorepos, and the tools to build them.](https://monorepo.tools/)
 - [An abbreviated history of JavaScript package managers](https://javascript.plainenglish.io/an-abbreviated-history-of-javascript-package-managers-f9797be7cf0e)

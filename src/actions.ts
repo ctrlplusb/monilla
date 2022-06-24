@@ -5,7 +5,7 @@ import {
   updateInternalDependencyPathsForPackage,
 } from "./packages";
 import { resolveRootDirectory } from "./resolve-root-directory";
-import { runCommandAgainstPackage } from "./spawn";
+import { runCommandAgainstPackage, spawnClean } from "./spawn";
 import { copyPackageToStore, resolveStoreDirectory } from "./store";
 
 export async function install(workingDirectory: string): Promise<void> {
@@ -15,36 +15,37 @@ export async function install(workingDirectory: string): Promise<void> {
   const packages = await resolvePackages(rootDirectory);
   const packageTree = buildPackageTree(packages);
 
-  const packagesInStore = new Set<string>();
-
   await executeAgainstPackageTree(packageTree, async (packageNode) => {
-    // First ensure that all the internal package dependencies have been
-    // copied to the shared store.
-    for (const dependency of packageNode.dependencies) {
-      if (packagesInStore.has(dependency.name)) {
-        // This dependency has already been copied to the store within this
-        // CLI execution, therefore we will continue to the next dependency.
-        continue;
-      }
+    // Check if this package has any dependants, if so we will need to build
+    // the package and make it available via the store for consumption by
+    // the dependants;
+    if (packageNode.dependants.length > 0) {
       // This package has a build command, therefore we will execute it
       // to ensure we have all the required files available prior to
       // attempting to copy the package to the monilla store.
-      if (dependency.packageJson.scripts?.build != null) {
-        await runCommandAgainstPackage(dependency, "npm", ["build"]);
+      if (packageNode.packageMeta.packageJson.scripts?.build != null) {
+        await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
+          "run",
+          "build",
+        ]);
       }
+
+      // Ensure that this package has been copied to our internal store
       await copyPackageToStore({
-        packageDirectory: dependency.directory,
+        packageDirectory: packageNode.packageMeta.directory,
         storeDirectory,
       });
-      packagesInStore.add(dependency.name);
     }
 
-    // Then we ensure that the package.json for our package has the correct
-    // paths to our internal packages.
-    await updateInternalDependencyPathsForPackage(
-      packageNode.packageMeta,
-      storeDirectory,
-    );
+    // Check if this package has any dependencies on internal packages, if so
+    // then we ensure that the package.json for our package has the correct
+    // paths to our internal packages;
+    if (packageNode.dependencies.length > 0) {
+      await updateInternalDependencyPathsForPackage(
+        packageNode.packageMeta,
+        storeDirectory,
+      );
+    }
 
     await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
       "install",
@@ -53,4 +54,25 @@ export async function install(workingDirectory: string): Promise<void> {
       "--install-links",
     ]);
   });
+}
+
+export async function updateDeps(
+  workingDirectory: string,
+  opts: { target: string },
+) {
+  const rootDirectory = await resolveRootDirectory(workingDirectory);
+
+  console.log(
+    `Checking for package updates against target of "${opts.target}"...`,
+  );
+  await spawnClean(rootDirectory, "npx", [
+    "npm-check-updates",
+    "--deep",
+    "--interactive",
+    "--loglevel",
+    "minimal",
+    "--target",
+    opts.target,
+  ]);
+  await install(workingDirectory);
 }

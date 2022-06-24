@@ -16,9 +16,19 @@ function resolveDependenciesFor(
   );
 }
 
+function resolveDependantsFor(
+  forThis: PackageMeta,
+  fromThese: PackageMeta[],
+): PackageMeta[] {
+  return fromThese.filter((p) =>
+    p.internalPackageDependencies.includes(forThis.name),
+  );
+}
+
 export type PackageNode = {
   packageMeta: PackageMeta;
   dependencies: PackageMeta[];
+  dependants: PackageMeta[];
 };
 
 export type PackageTreeLevel = PackageNode[];
@@ -34,7 +44,9 @@ export function buildPackageTree(packageMetas: PackageMeta[]): PackageTree {
     // TODO: The root package shouldn't be a dependency of any other package,
     // or have any dependency to any other package. Perhaps we should guard
     // against this case explicitly?
-    packageTree.push([{ packageMeta: rootPackageMeta, dependencies: [] }]);
+    packageTree.push([
+      { packageMeta: rootPackageMeta, dependencies: [], dependants: [] },
+    ]);
   }
 
   const otherPackageMetas = packageMetas.filter((p) => !p.isRoot);
@@ -62,14 +74,26 @@ export function buildPackageTree(packageMetas: PackageMeta[]): PackageTree {
         // If there are 0, then we know that all of the internal package dependencies
         // for this package (if they had any) have been added to the tree, which
         // means we can safely add this package to the tree
-        nextLevel.push({
-          packageMeta: unprocessedPackage,
-          dependencies: resolveDependenciesFor(
-            unprocessedPackage,
-            packageMetas,
-          ),
-        });
-        packagesAddedToTree.push(unprocessedPackage);
+
+        // We need to do an additional check to ensure this package has not
+        // already been added at this level. It could be that their are multiple
+        // packages referencing this package at the next level, which could
+        // cause duplicate entries;
+        if (
+          nextLevel.find(
+            (p) => p.packageMeta.name === unprocessedPackage.name,
+          ) == null
+        ) {
+          nextLevel.push({
+            packageMeta: unprocessedPackage,
+            dependencies: resolveDependenciesFor(
+              unprocessedPackage,
+              packageMetas,
+            ),
+            dependants: resolveDependantsFor(unprocessedPackage, packageMetas),
+          });
+          packagesAddedToTree.push(unprocessedPackage);
+        }
       }
     });
 
@@ -145,9 +169,10 @@ export async function resolvePackages(
   > = {};
 
   for (const packageJsonPath of packageJsonPaths) {
-    const packageJson: PackageJson = (
-      await import(packageJsonPath, { assert: { type: "json" } })
-    ).default;
+    const packageJson: PackageJson = await readPackage({
+      cwd: path.dirname(packageJsonPath),
+      normalize: false,
+    });
 
     if (packageJson.name == null || packageJson.name.trim().length === 0) {
       throw new MonillaError(

@@ -6,7 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
 import packageJSON from "../package.json";
-import { install } from "./actions";
+import { install, updateDeps } from "./actions";
 import { cliCommand, requiredMinNpmVersion } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";
 
@@ -56,6 +56,31 @@ yargs(hideBin(process.argv))
     handler: async () => {
       const cwd = process.cwd();
       await install(cwd);
+    },
+  })
+  .command({
+    command: "update-deps",
+    describe:
+      "Perform an interactive update for the dependencies across your monorepo.",
+    builder: (args) => {
+      return args.option("target", {
+        alias: "t",
+        describe: `Choose the upgrade target (latest, minor, patch)
+- latest:
+Upgrade to whatever the package's "latest" tag points to. Excludes pre.
+- minor (default):
+Upgrade to the highest minor version without bumping the major version.
+- patch:
+Upgrade to the highest patch version without bumping the minor or major versions.`,
+        choices: ["latest", "minor", "patch"],
+        default: "minor",
+      });
+    },
+    handler: async (argv) => {
+      const cwd = process.cwd();
+      await updateDeps(cwd, {
+        target: argv.target,
+      });
     },
   })
   .command({

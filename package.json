@@ -7,6 +7,7 @@
     "node": ">=16.13.0",
     "npm": ">=8.8.0"
   },
+  "type": "module",
   "engineStrict": true,
   "repository": {
     "type": "git",
@@ -19,7 +20,7 @@
     "monilla": "dist/cli.mjs"
   },
   "scripts": {
-    "build": "tsup-node src/cli.ts --sourcemap inline --format esm --target node16",
+    "build": "tsup-node src/cli.ts --sourcemap --format esm --target node16",
     "lint": "eslint . --ext .js,.ts,.json",
     "prepare": "npm run build",
     "test": "vitest",
@@ -35,16 +36,16 @@
   "author": "Sean Matheson",
   "license": "MIT",
   "dependencies": {
-    "child-process-toolbox": "^3.0.4",
     "find-up": "^6.3.0",
     "fs-extra": "^10.1.0",
-    "globby": "^13.1.1",
-    "npm-packlist": "^5.0.4",
+    "globby": "^13.1.2",
+    "npm-check-updates": "^14.1.1",
+    "npm-packlist": "^5.1.0",
     "p-series": "^3.0.0",
     "read-pkg": "^7.1.0",
     "semver": "^7.3.7",
     "ts-custom-error": "^3.2.0",
-    "type-fest": "^2.12.2",
+    "type-fest": "^2.13.1",
     "write-pkg": "^5.1.0",
     "yargs": "^17.5.1",
     "zod": "^3.17.3"
@@ -53,20 +54,20 @@
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^16.11.35",
     "@types/npm-packlist": "^3.0.0",
-    "@types/semver": "^7.3.9",
+    "@types/semver": "^7.3.10",
     "@types/yargs": "^17.0.10",
-    "@typescript-eslint/eslint-plugin": "^5.26.0",
-    "@typescript-eslint/parser": "^5.26.0",
-    "eslint": "^8.16.0",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "eslint": "^8.18.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.1",
     "tempy": "^3.0.0",
-    "tsup": "^5.12.8",
-    "typescript": "^4.7.0-beta",
-    "vitest": "^0.12.9"
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "vitest": "^0.15.2"
   },
   "eslintConfig": {
     "root": true,

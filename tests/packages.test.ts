@@ -97,10 +97,28 @@ describe("buildPackageTree", () => {
 
     // EXPECT
     expect(actual).toMatchObject([
-      [{ packageMeta: { name: "root" }, dependencies: [] }],
-      [{ packageMeta: { name: "c" }, dependencies: [] }],
-      [{ packageMeta: { name: "b" }, dependencies: [{ name: "c" }] }],
-      [{ packageMeta: { name: "a" }, dependencies: [{ name: "b" }] }],
+      [{ packageMeta: { name: "root" }, dependencies: [], dependants: [] }],
+      [
+        {
+          packageMeta: { name: "c" },
+          dependencies: [],
+          dependants: [{ name: "b" }, { name: "a" }],
+        },
+      ],
+      [
+        {
+          packageMeta: { name: "b" },
+          dependencies: [{ name: "c" }],
+          dependants: [],
+        },
+      ],
+      [
+        {
+          packageMeta: { name: "a" },
+          dependencies: [{ name: "b" }],
+          dependants: [],
+        },
+      ],
     ]);
   });
 
@@ -108,6 +126,7 @@ describe("buildPackageTree", () => {
     /*
     root
     |- a(b, c)
+    |- b
     |- c
     */
 
@@ -153,10 +172,12 @@ describe("buildPackageTree", () => {
         expect.objectContaining({
           packageMeta: expect.objectContaining({ name: "b" }),
           dependencies: [],
+          dependants: [expect.objectContaining({ name: "a" })],
         }),
         expect.objectContaining({
           packageMeta: expect.objectContaining({ name: "c" }),
           dependencies: [],
+          dependants: [expect.objectContaining({ name: "a" })],
         }),
       ]),
       [
@@ -243,6 +264,77 @@ describe("buildPackageTree", () => {
       errorMessageFor(ErrorCode.CircularDependency),
     );
   });
+
+  test.only("case-5 - multi references", () => {
+    /*
+    root
+    |- a(c)
+    |- b(c)
+    |- c
+    */
+
+    // ARRANGE
+
+    const a: PackageMeta = {
+      name: "a",
+      packageJson: {},
+      isRoot: false,
+      packageJsonPath: "./a/package.json",
+      directory: "./a/",
+      internalPackageDependencies: ["c"],
+    };
+    const b: PackageMeta = {
+      name: "b",
+      packageJson: {},
+      isRoot: false,
+      packageJsonPath: "./b/package.json",
+      directory: "./b/",
+      internalPackageDependencies: ["c"],
+    };
+    const c: PackageMeta = {
+      name: "c",
+      packageJson: {},
+      isRoot: false,
+      packageJsonPath: "./c/package.json",
+      directory: "./c/",
+      internalPackageDependencies: [],
+    };
+
+    // ACT
+    const actual = buildPackageTree([root, a, b, c]);
+
+    // EXPECT
+    expect(actual).toMatchObject([
+      [
+        {
+          packageMeta: { name: "root" },
+          dependencies: [],
+        },
+      ],
+      [
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "c" }),
+          dependencies: [],
+          dependants: expect.arrayContaining([
+            expect.objectContaining({ name: "a" }),
+            expect.objectContaining({ name: "b" }),
+          ]),
+        }),
+      ],
+      expect.arrayContaining([
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "a" }),
+          dependencies: [expect.objectContaining({ name: "c" })],
+          dependants: [],
+        }),
+        expect.objectContaining({
+          packageMeta: expect.objectContaining({ name: "b" }),
+          dependencies: [expect.objectContaining({ name: "c" })],
+          dependants: [],
+        }),
+      ]),
+    ]);
+  });
 });
 
 describe("executeAgainstPackageTree", () => {
@@ -267,6 +359,7 @@ describe("executeAgainstPackageTree", () => {
         internalPackageDependencies: ["b", "c", "d"],
       },
       dependencies: [],
+      dependants: [],
     };
     const b: PackageNode = {
       packageMeta: {
@@ -278,6 +371,7 @@ describe("executeAgainstPackageTree", () => {
         internalPackageDependencies: ["c"],
       },
       dependencies: [],
+      dependants: [],
     };
     const c: PackageNode = {
       packageMeta: {
@@ -289,6 +383,7 @@ describe("executeAgainstPackageTree", () => {
         internalPackageDependencies: ["d"],
       },
       dependencies: [],
+      dependants: [],
     };
     const d: PackageNode = {
       packageMeta: {
@@ -300,6 +395,7 @@ describe("executeAgainstPackageTree", () => {
         internalPackageDependencies: [],
       },
       dependencies: [],
+      dependants: [],
     };
 
     const level1: PackageTreeLevel = [a];

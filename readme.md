@@ -28,7 +28,7 @@ A CLI to manage monorepos with predictability and stability.
 
 ## 1. Introduction
 
-Monilla is CLI tool which enables the development of clean `npm`-based [monorepos](https://monorepo.tools). Some of its core features includes;
+Monilla is a CLI tool which improves the development experience against `npm`-based [monorepos](https://monorepo.tools).
 
 - Quickly install dependencies across your monorepo;
   ```bash
@@ -61,9 +61,9 @@ We lean heavily into a "standard" npm experience and promote the capability for 
 
   At any time you should be able to stop using `monilla` and just run standard `npm` commands. Yes, you might have to execute a lot of `npm` commands depending on how many packages are in your project, but you'll be able to do so at the least.
 
-- Each package should be as though it were an independent `npm` package.
+- Treat each package as though it were an independent `npm` package.
 
-  We expect that each package within your monorepo is built almost as if it were independent. It's own package.json scripts, dependencies, etc. This should allow for cleaner publishing of packages to an `npm` registry, whilst also enabling lifting and shifting of packages in or out of your monorepo.
+  We expect that each package within your monorepo is built almost as if it were independent. It's own package.json scripts, dependencies, etc. This enables richer workflows for packages being operated against in isolation. For example, cleaner publishing workflows for packages to an `npm` registry, or simple lifting and shifting of packages in or out of your monorepo.
 
 &nbsp;
 
@@ -71,9 +71,9 @@ We lean heavily into a "standard" npm experience and promote the capability for 
 
 ## 3. Prerequisites
 
-You need **Node.js** version `18.4.0` or higher to use this CLI.
+**Node.js** version `18.4.0` or higher is required to use this CLI.
 
-We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which allows you to install and switch between multiple versions of Node.js seamlessly. Utilising `nvm` you can install the required version of Node.js via the following command;
+We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which enables you to install and switch between multiple versions of Node.js seamlessly. Utilising `nvm` you can install the required version of Node.js via the following command;
 
 ```bash
 nvm install --default 18
@@ -89,7 +89,7 @@ This will install the latest version Node.js 18, whilst also making it the defau
 
 **Installation**
 
-We recommend performing a global installation of monilla;
+We recommend performing a global installation of `monilla`;
 
 ```bash
 npm install monilla -g
@@ -142,13 +142,11 @@ my-mono-repo
 
 Using this as a reference, we'll describe a few scenarios below.
 
-> Note: I'm prefixing each of the `monilla` commands with `npx`. If you are unfamiliar with `npx` you can [read more about it here](https://docs.npmjs.com/cli/v8/commands/npx). tldr - It will allow you to quickly execute commands against the locally installed `monilla` CLI.
-
 &nbsp;
 
 ### 5.1. Initialising your dependencies
 
-If you are performing a fresh clone of a repository, or switching branched, then we recommend you run the following command;
+Any time you need to make sure your dependencies for your packages are installed and internal packages are correctly linked, then this is the command for you;
 
 ```bash
 monilla install
@@ -156,12 +154,14 @@ monilla install
 
 This performs two functions;
 
-- Ensures that any linked packages are properly bound
-- Ensures the correct dependencies are installed for each package
+- Installs the required dependencies for each package within the monorepo, including the root
+- Ensures that any linked packages within the monorepo are bound
 
 &nbsp;
 
 ### 5.2. Linking and Unlinking packages
+
+Linking enables you to use one of your monorepo packages within another as though it were installed via an NPM registry.
 
 The example monorepo contains a mobile app, and a components library. If we wished to utilise the components library within the mobile app we can link the package.
 
@@ -171,7 +171,7 @@ You can do so by running the `link` command within the root of your monorepo;
 monilla link @my/components --to @my/mobile-app
 ```
 
-> Note: if the source package has a `build` script it will be executed prior to performing the link.
+> Note: if the source package has a `build` script we will execute it prior to link, ensuring that all the required source files are available.
 
 Conversely, if you'd like to `unlink` a package you can do the following;
 

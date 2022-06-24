@@ -1,10 +1,10 @@
 {
   "name": "monilla",
   "version": "0.1.0",
-  "description": "Manage your monorepo dependencies in a vanilla-esque manner.",
+  "description": "A CLI to manage monorepos with predictability and stability.",
   "homepage": "https://github.com/ctrlplusb/monilla",
   "engines": {
-    "node": ">=16.13.0",
+    "node": ">=18.4.0",
     "npm": ">=8.8.0"
   },
   "type": "module",

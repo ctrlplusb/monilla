@@ -71,19 +71,15 @@ We lean heavily into a "standard" npm experience and promote the capability for 
 
 ## 3. Prerequisites
 
-You need the following available on your system to use this CLI;
+You need **Node.js** version `18.4.0` or higher to use this CLI.
 
-- **Node.js** version `18.4.0` or higher
-
-We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which allows you to install and switch between multiple versions of Node.js seamlessly.
-
-Once you have it installed you can install the required version of the Node.js via the following command;
+We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which allows you to install and switch between multiple versions of Node.js seamlessly. Utilising `nvm` you can install the required version of Node.js via the following command;
 
 ```bash
 nvm install --default 18
 ```
 
-This will install the latest version of the major version 18 of Node.js, whilst also making it the default Node.js version that will be used on your machine.
+This will install the latest version Node.js 18, whilst also making it the default version used on your machine.
 
 &nbsp;
 
@@ -99,11 +95,12 @@ We recommend performing a global installation of monilla;
 npm install monilla -g
 ```
 
-> You can safely install it as a direct dependency at the root of your monorepo if you prefer/need.
->
-> ```bash
-> npm install monilla --save-dev
-> ```
+_Or..._
+you can safely install it as a direct dependency at the root of your monorepo if you need/prefer;
+
+```bash
+npm install monilla --save-dev
+```
 
 **Configuration**
 

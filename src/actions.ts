@@ -1,16 +1,18 @@
+import chokidar from "chokidar";
+import path from "path";
+
 import {
   buildPackageTree,
   executeAgainstPackageTree,
+  PackageMeta,
   resolvePackages,
   updateInternalDependencyPathsForPackage,
 } from "./packages";
-import { resolveRootDirectory } from "./resolve-root-directory";
 import { runCommandAgainstPackage, spawnClean } from "./spawn";
 import { copyPackageToStore, resolveStoreDirectory } from "./store";
 
-export async function install(workingDirectory: string): Promise<void> {
-  const rootDirectory = await resolveRootDirectory(workingDirectory);
-  const storeDirectory = await resolveStoreDirectory(workingDirectory);
+export async function install(rootDirectory: string): Promise<void> {
+  const storeDirectory = await resolveStoreDirectory(rootDirectory);
 
   const packages = await resolvePackages(rootDirectory);
   const packageTree = buildPackageTree(packages);
@@ -56,15 +58,8 @@ export async function install(workingDirectory: string): Promise<void> {
   });
 }
 
-export async function updateDeps(
-  workingDirectory: string,
-  opts: { target: string },
-) {
-  const rootDirectory = await resolveRootDirectory(workingDirectory);
-
-  console.log(
-    `Checking for package updates against target of "${opts.target}"...`,
-  );
+export async function upgrade(rootDirectory: string, opts: { target: string }) {
+  console.log(`Finding "${opts.target}" package upgrades`);
   await spawnClean(rootDirectory, "npx", [
     "npm-check-updates",
     "--deep",
@@ -74,5 +69,37 @@ export async function updateDeps(
     "--target",
     opts.target,
   ]);
-  await install(workingDirectory);
+  await install(rootDirectory);
+}
+
+export async function watch(rootDirectory: string) {
+  const packages = await resolvePackages(rootDirectory);
+  const packageTree = buildPackageTree(packages);
+
+  const linkedPackages = packageTree.reduce<PackageMeta[]>((acc, level) => {
+    level.forEach((pkgNode) => {
+      if (pkgNode.dependants.length > 0) {
+        acc.push(pkgNode.packageMeta);
+      }
+    });
+    return acc;
+  }, []);
+
+  // const packageTree = buildPackageTree(packages);
+
+  const watcher = chokidar.watch(
+    linkedPackages.map((pkg) => path.join(pkg.directory, "src")),
+  );
+
+  watcher.addListener("change", async () => {
+    console.log("done");
+  });
+
+  let resolver: (v: any) => void;
+
+  const promise = new Promise((resolve) => {
+    resolver = resolve;
+  });
+
+  await promise;
 }

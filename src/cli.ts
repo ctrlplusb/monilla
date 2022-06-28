@@ -6,7 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
 import packageJSON from "../package.json";
-import { install, updateDeps } from "./actions";
+import { install, upgrade, watch } from "./actions";
 import { cliCommand, requiredMinNpmVersion } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";
 
@@ -42,14 +42,6 @@ yargs(hideBin(process.argv))
     },
   })
   .command({
-    command: "init",
-    describe:
-      "Initializes Monilla into your project, adding the required configuration",
-    handler: () => {
-      throw new MonillaError(ErrorCode.NotImplemented);
-    },
-  })
-  .command({
     command: "install",
     describe:
       "Installs the dependencies across your monorepo, whilst also ensuring internal package dependencies linked correctly.",
@@ -59,9 +51,24 @@ yargs(hideBin(process.argv))
     },
   })
   .command({
-    command: "update-deps",
+    command: "link",
     describe:
-      "Perform an interactive update for the dependencies across your monorepo.",
+      "Link a package within your monorepo to another within the monorepo.",
+    builder: (args) =>
+      args
+        .string(["from", "to"])
+        .demandOption(["from", "to"])
+        .describe("from", "The package to link from")
+        .describe("to", "The package to link to")
+        .usage("Usage: monilla link --from <from> --to <to>"),
+    handler: async (argv) => {
+      throw new MonillaError(ErrorCode.NotImplemented);
+    },
+  })
+  .command({
+    command: "upgrade",
+    describe:
+      "Perform an interactive upgrade for the monorepo package dependencies.",
     builder: (args) => {
       return args.option("target", {
         alias: "t",
@@ -78,18 +85,18 @@ Upgrade to the highest patch version without bumping the minor or major versions
     },
     handler: async (argv) => {
       const cwd = process.cwd();
-      await updateDeps(cwd, {
+      await upgrade(cwd, {
         target: argv.target,
       });
     },
   })
   .command({
-    command: "link",
-    describe: "Links the dependencies for your packages",
-    builder: (args) => {
-      return args.string("from");
-    },
-    handler: async () => {
+    command: "watch",
+    describe:
+      "Watches linked packages, rebuilding and updating their links when changes are detected.",
+    handler: async (argv) => {
+      const cwd = process.cwd();
+      await watch(cwd);
       throw new MonillaError(ErrorCode.NotImplemented);
     },
   })

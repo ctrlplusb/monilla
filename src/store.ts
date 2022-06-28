@@ -6,11 +6,8 @@ import { NormalizedPackageJson, readPackage } from "read-pkg";
 
 import { monillaDirectoryName, signatureFileName } from "./constants";
 import { ErrorCode, MonillaError } from "./monilla-error";
-import { resolveRootDirectory } from "./resolve-root-directory";
 
-export async function resolveStoreDirectory(workingDirectory: string) {
-  const rootDirectory = await resolveRootDirectory(workingDirectory);
-
+export async function resolveStoreDirectory(rootDirectory: string) {
   const storeDirectory = path.join(
     rootDirectory,
     monillaDirectoryName,

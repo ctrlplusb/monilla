@@ -4,8 +4,7 @@
   "description": "A CLI to manage monorepos with predictability and stability.",
   "homepage": "https://github.com/ctrlplusb/monilla",
   "engines": {
-    "node": ">=18.4.0",
-    "npm": ">=8.8.0"
+    "node": ">=18"
   },
   "type": "module",
   "engineStrict": true,
@@ -17,7 +16,7 @@
     "dist"
   ],
   "bin": {
-    "monilla": "dist/cli.mjs"
+    "monilla": "dist/cli.js"
   },
   "scripts": {
     "build": "tsup-node src/cli.ts --sourcemap --format esm --target node16",
@@ -36,6 +35,7 @@
   "author": "Sean Matheson",
   "license": "MIT",
   "dependencies": {
+    "chokidar": "^3.5.3",
     "find-up": "^6.3.0",
     "fs-extra": "^10.1.0",
     "globby": "^13.1.2",
@@ -44,6 +44,7 @@
     "p-series": "^3.0.0",
     "read-pkg": "^7.1.0",
     "semver": "^7.3.7",
+    "symlink-dir": "^5.0.1",
     "ts-custom-error": "^3.2.0",
     "type-fest": "^2.13.1",
     "write-pkg": "^5.1.0",

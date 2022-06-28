@@ -7,6 +7,8 @@ export async function spawnClean(
   command: string,
   args: readonly string[] = [],
 ) {
+  console.log(workingDirectory, command, args);
+
   spawnSync(command, ["--color=always", ...args], {
     shell: true,
     stdio: "inherit",

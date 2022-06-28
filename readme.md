@@ -11,13 +11,13 @@ A CLI to manage monorepos with predictability and stability.
 - [1. Introduction](#1-introduction)
 - [2. Goals](#2-goals)
 - [3. Prerequisites](#3-prerequisites)
-- [4. Setup](#4-setup)
+- [4. Install](#4-install)
 - [5. Guide](#5-guide)
   - [5.1. Initialising your dependencies](#51-initialising-your-dependencies)
   - [5.2. Linking and Unlinking packages](#52-linking-and-unlinking-packages)
   - [5.3. Making updates to your linked packages](#53-making-updates-to-your-linked-packages)
   - [5.4. Watching updates to your linked packages](#54-watching-updates-to-your-linked-packages)
-  - [5.5. Performing an interactive update of dependencies across all packages](#55-performing-an-interactive-update-of-dependencies-across-all-packages)
+  - [5.5. Performing an interactive upgrade of dependencies across all packages](#55-performing-an-interactive-upgrade-of-dependencies-across-all-packages)
 - [6. CLI Reference](#6-cli-reference)
 - [7. Appreciation](#7-appreciation)
 - [8. Further Reading / References](#8-further-reading--references)
@@ -30,17 +30,17 @@ A CLI to manage monorepos with predictability and stability.
 
 Monilla is a CLI tool which improves the development experience against `npm`-based [monorepos](https://monorepo.tools).
 
-- Quickly install dependencies across your monorepo;
+- Quickly install dependencies across your monorepo, respecting any internal package references;
   ```bash
   monilla install
   ```
 - Seamlessly link your packages within your monorepo;
   ```bash
-  monilla link @my/components --to @my/ui
+  monilla link --from @my/components --to @my/ui
   ```
 - Perform interactive dependency updates across your monorepo;
   ```bash
-  monilla update-deps
+  monilla upgrade
   ```
 - Coordinate command execution across your monorepo packages, whilst respecting their dependency tree;
   ```bash
@@ -71,46 +71,33 @@ We lean heavily into a "standard" npm experience and promote the capability for 
 
 ## 3. Prerequisites
 
-**Node.js** version `18.4.0` or higher is required to use this CLI.
+**Node.js** version 18 or higher is required to use this CLI.
 
-We highly recommend the use of [nvm](https://github.com/nvm-sh/nvm), which enables you to install and switch between multiple versions of Node.js seamlessly. Utilising `nvm` you can install the required version of Node.js via the following command;
+> **Note**
+>
+> Unfortunately we have this hard requirement as there was a shift in the way that `npm` manages the dependencies for linked packages. A workaround was introduced in `npm@8.8.0`. A compatible version of `npm` ships with Node.js 18.
+
+We highly recommend installing [nvm](https://github.com/nvm-sh/nvm) on your machine. It enables you to manage multiple versions of Node.js seamlessly. Utilising `nvm` you can install the required version of Node.js via the following command;
 
 ```bash
 nvm install --default 18
 ```
 
-This will install the latest version Node.js 18, whilst also making it the default version used on your machine.
+> **Note**
+>
+> The `--default` flag will make this installation the default version on your machine.
 
 &nbsp;
 
 ---
 
-## 4. Setup
+## 4. Install
 
-**Installation**
-
-We recommend performing a global installation of `monilla`;
-
-```bash
-npm install monilla -g
-```
-
-_Or..._
-you can safely install it as a direct dependency at the root of your monorepo if you need/prefer;
+We recommend installing monilla as a dev dependency in the root of your monorepo;
 
 ```bash
 npm install monilla --save-dev
 ```
-
-**Configuration**
-
-After the installation completes run the following command at the root of your monorepo;
-
-```bash
-monilla init
-```
-
-This will create a `.monilla.json` configuration file (if it does not yet exists) and update your `.gitignore` configuration file (if it exists) with the recommended excludes.
 
 &nbsp;
 
@@ -171,7 +158,9 @@ You can do so by running the `link` command within the root of your monorepo;
 monilla link @my/components --to @my/mobile-app
 ```
 
-> Note: if the source package has a `build` script we will execute it prior to link, ensuring that all the required source files are available.
+> **Note**
+>
+> If the source package has a `build` script we will execute it prior to link, ensuring that all the required source files are available.
 
 Conversely, if you'd like to `unlink` a package you can do the following;
 
@@ -179,7 +168,9 @@ Conversely, if you'd like to `unlink` a package you can do the following;
 monilla unlink @my/components --from @my/mobile-app
 ```
 
-> **Note:** Monilla does not support circular dependencies between packages and will throw an error or warning if you try to create one.
+> **Note**
+>
+> Monilla does not support circular dependencies between packages and will throw an error or warning if you try to create one.
 
 &nbsp;
 
@@ -191,7 +182,9 @@ If you've performed updates to one of your linked packages, you can ensure that 
 monilla refresh
 ```
 
-> Note: if your linked package has a `build` script it will be executed prior to performing the refresh.
+> **Note**
+>
+> If your linked package has a `build` script it will be executed prior to performing the refresh.
 
 &nbsp;
 
@@ -203,16 +196,18 @@ To watch for changes to your packages, resulting in automatic building and refre
 monilla watch
 ```
 
-> **Note:** We utilise your `.gitignore` file to determine which files to ignore when executing this process.
+> **Note**
+>
+> We utilise your `.gitignore` file to determine which files to ignore when executing this process.
 
 &nbsp;
 
-### 5.5. Performing an interactive update of dependencies across all packages
+### 5.5. Performing an interactive upgrade of dependencies across all packages
 
-To perform an interactive update of the dependencies for all of the packages within your monorepo execute the following command;
+To perform an interactive upgrade of the dependencies for all of the packages within your monorepo execute the following command;
 
 ```bash
-monilla update-deps
+monilla upgrade
 ```
 
 You'll be asked which packages you'd like to update for each of the packages within your monorepo. After this has completed we'll take care of the installs and refreshing of your linked packages.

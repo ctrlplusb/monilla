@@ -1,3 +1,4 @@
+import fs from "fs-extra";
 import { globby } from "globby";
 import pSeries from "p-series";
 import path, { dirname } from "path";
@@ -6,6 +7,7 @@ import { JsonObject, PackageJson } from "type-fest";
 import { writePackage } from "write-pkg";
 
 import { ErrorCode, MonillaError } from "./monilla-error";
+import { spawnClean } from "./spawn";
 
 function resolveDependenciesFor(
   forThis: PackageMeta,
@@ -219,50 +221,53 @@ export async function updateInternalDependencyPathsForPackage(
   packageMeta: PackageMeta,
   storeDirectory: string,
 ): Promise<void> {
+  if (packageMeta.internalPackageDependencies.length === 0) {
+    return;
+  }
+
   const packageJson = await readPackage({
     cwd: packageMeta.directory,
     normalize: false,
   });
 
-  let didMutatePackageJson = false;
+  for (const internalPackageName of packageMeta.internalPackageDependencies) {
+    const dependencyProperties = [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+    ] as const;
 
-  for (const dep of packageMeta.internalPackageDependencies) {
-    const fileRefToDepInStore = `file:${path.relative(
-      packageMeta.directory,
-      path.join(storeDirectory, dep),
-    )}`;
-
-    if (
-      packageJson.dependencies &&
-      packageJson.dependencies[dep] &&
-      packageJson.dependencies[dep] !== fileRefToDepInStore
-    ) {
-      packageJson.dependencies[dep] = fileRefToDepInStore;
-      didMutatePackageJson = true;
-    }
-
-    if (
-      packageJson.devDependencies &&
-      packageJson.devDependencies[dep] &&
-      packageJson.devDependencies[dep] !== fileRefToDepInStore
-    ) {
-      packageJson.devDependencies[dep] = fileRefToDepInStore;
-      didMutatePackageJson = true;
-    }
-
-    if (
-      packageJson.peerDependencies &&
-      packageJson.peerDependencies[dep] &&
-      packageJson.peerDependencies[dep] !== fileRefToDepInStore
-    ) {
-      packageJson.peerDependencies[dep] = fileRefToDepInStore;
-      didMutatePackageJson = true;
-    }
-  }
-
-  if (didMutatePackageJson) {
-    await writePackage(packageMeta.directory, packageJson as JsonObject, {
-      normalize: false,
+    dependencyProperties.forEach((dependencyType) => {
+      const dependencies = packageJson[dependencyType];
+      if (dependencies != null && dependencies[internalPackageName]) {
+        dependencies[internalPackageName] = `file:${path.relative(
+          packageMeta.directory,
+          path.join(storeDirectory, internalPackageName),
+        )}`;
+      }
     });
+
+    // Create a symbolic link of the package dependency within the node_modules
+    // directory for the current package. The symbolic link will point to
+    // the monilla store containing a prepped version of the internal package.
+    const symlinkPath = path.join(
+      packageMeta.directory,
+      "node_modules",
+      internalPackageName,
+    );
+    try {
+      fs.removeSync(symlinkPath);
+    } catch (_err) {
+      // Swallow this error - a prior symlink didn't exist.
+    }
+    fs.symlinkSync(
+      path.join(storeDirectory, internalPackageName),
+      symlinkPath,
+      "dir",
+    );
   }
+
+  await writePackage(packageMeta.directory, packageJson as JsonObject, {
+    normalize: false,
+  });
 }

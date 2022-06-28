@@ -66,9 +66,18 @@ yargs(hideBin(process.argv))
     },
   })
   .command({
+    command: "refresh",
+    describe:
+      "Refreshes your packages to use the latest build of each internal package.",
+    handler: async () => {
+      const cwd = process.cwd();
+      await install(cwd, false);
+    },
+  })
+  .command({
     command: "upgrade",
     describe:
-      "Perform an interactive upgrade for the monorepo package dependencies.",
+      "Perform an interactive upgrade for the dependencies across your monorepo packages.",
     builder: (args) => {
       return args.option("target", {
         alias: "t",
@@ -93,11 +102,10 @@ Upgrade to the highest patch version without bumping the minor or major versions
   .command({
     command: "watch",
     describe:
-      "Watches linked packages, rebuilding and updating their links when changes are detected.",
+      "Watches internal packages for changes, updating the dependant packages when changes are detected.",
     handler: async (argv) => {
       const cwd = process.cwd();
       await watch(cwd);
-      throw new MonillaError(ErrorCode.NotImplemented);
     },
   })
   .help("help").argv;

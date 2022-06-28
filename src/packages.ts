@@ -7,7 +7,8 @@ import { JsonObject, PackageJson } from "type-fest";
 import { writePackage } from "write-pkg";
 
 import { ErrorCode, MonillaError } from "./monilla-error";
-import { spawnClean } from "./spawn";
+import { runCommandAgainstPackage, spawnClean } from "./spawn";
+import { copyPackageToStore } from "./store";
 
 function resolveDependenciesFor(
   forThis: PackageMeta,
@@ -217,57 +218,64 @@ export async function resolvePackages(
   return packageJsons;
 }
 
-export async function updateInternalDependencyPathsForPackage(
+export function copyInternalDependencyToPackage(
   packageMeta: PackageMeta,
   storeDirectory: string,
-): Promise<void> {
+  internalDependencyName: string,
+): void {
+  // Create a copy of the package dependency within the node_modules
+  // directory for the current package. We copy the version from our
+  // Monilla store which will have been prepared via npm packlist so that
+  // depenedencies etc will be installed and resolved in an expected manner
+  // for the package;
+
+  const linkedPath = path.join(
+    packageMeta.directory,
+    "node_modules",
+    internalDependencyName,
+  );
+
+  if (fs.existsSync(linkedPath)) {
+    fs.removeSync(linkedPath);
+  }
+
+  fs.copySync(path.join(storeDirectory, internalDependencyName), linkedPath);
+}
+
+export function copyInternalDependenciesToPackage(
+  packageMeta: PackageMeta,
+  storeDirectory: string,
+): void {
   if (packageMeta.internalPackageDependencies.length === 0) {
     return;
   }
 
-  const packageJson = await readPackage({
-    cwd: packageMeta.directory,
-    normalize: false,
-  });
-
   for (const internalPackageName of packageMeta.internalPackageDependencies) {
-    const dependencyProperties = [
-      "dependencies",
-      "devDependencies",
-      "peerDependencies",
-    ] as const;
-
-    dependencyProperties.forEach((dependencyType) => {
-      const dependencies = packageJson[dependencyType];
-      if (dependencies != null && dependencies[internalPackageName]) {
-        dependencies[internalPackageName] = `file:${path.relative(
-          packageMeta.directory,
-          path.join(storeDirectory, internalPackageName),
-        )}`;
-      }
-    });
-
-    // Create a symbolic link of the package dependency within the node_modules
-    // directory for the current package. The symbolic link will point to
-    // the monilla store containing a prepped version of the internal package.
-    const symlinkPath = path.join(
-      packageMeta.directory,
-      "node_modules",
+    copyInternalDependencyToPackage(
+      packageMeta,
+      storeDirectory,
       internalPackageName,
     );
-    try {
-      fs.removeSync(symlinkPath);
-    } catch (_err) {
-      // Swallow this error - a prior symlink didn't exist.
-    }
-    fs.symlinkSync(
-      path.join(storeDirectory, internalPackageName),
-      symlinkPath,
-      "dir",
-    );
+  }
+}
+
+export async function installPackageToStore(
+  storeDirectory: string,
+  packageNode: PackageNode,
+) {
+  // This package has a build command, therefore we will execute it
+  // to ensure we have all the required files available prior to
+  // attempting to copy the package to the monilla store.
+  if (packageNode.packageMeta.packageJson.scripts?.build != null) {
+    await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
+      "run",
+      "build",
+    ]);
   }
 
-  await writePackage(packageMeta.directory, packageJson as JsonObject, {
-    normalize: false,
+  // Ensure that this package has been copied to our internal store
+  await copyPackageToStore({
+    packageDirectory: packageNode.packageMeta.directory,
+    storeDirectory,
   });
 }

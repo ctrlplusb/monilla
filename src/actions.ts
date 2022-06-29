@@ -42,6 +42,7 @@ export async function install(
     if (performNpmInstall) {
       await runCommandAgainstPackage(packageNode.packageMeta, "npm", [
         "install",
+        "--install-links",
       ]);
     }
   });

@@ -4,7 +4,7 @@
   "description": "A CLI to manage monorepos with predictability and stability.",
   "homepage": "https://github.com/ctrlplusb/monilla",
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "type": "module",
   "engineStrict": true,
@@ -46,7 +46,7 @@
     "semver": "^7.3.7",
     "symlink-dir": "^5.0.1",
     "ts-custom-error": "^3.2.0",
-    "type-fest": "^2.13.1",
+    "type-fest": "^2.14.0",
     "write-pkg": "^5.1.0",
     "yargs": "^17.5.1",
     "zod": "^3.17.3"
@@ -57,18 +57,18 @@
     "@types/npm-packlist": "^3.0.0",
     "@types/semver": "^7.3.10",
     "@types/yargs": "^17.0.10",
-    "@typescript-eslint/eslint-plugin": "^5.29.0",
-    "@typescript-eslint/parser": "^5.29.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
     "eslint": "^8.18.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^4.1.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "prettier": "^2.7.1",
     "tempy": "^3.0.0",
     "tsup": "^6.1.2",
     "typescript": "^4.7.4",
-    "vitest": "^0.15.2"
+    "vitest": "^0.16.0"
   },
   "eslintConfig": {
     "root": true,

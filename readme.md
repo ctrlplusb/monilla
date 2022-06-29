@@ -9,23 +9,25 @@ A CLI to manage monorepos with predictability and stability.
 &nbsp;
 
 - [1. Introduction](#1-introduction)
-- [2. Goals](#2-goals)
+- [2. Motivation](#2-motivation)
 - [3. Prerequisites](#3-prerequisites)
 - [4. Install](#4-install)
-- [5. Guide](#5-guide)
-  - [5.1. Installing your dependencies](#51-installing-your-dependencies)
-  - [5.2. Linking packages](#52-linking-packages)
-  - [5.3. Updating linked packages](#53-updating-linked-packages)
-  - [5.4. Watching updates to linked packages](#54-watching-updates-to-linked-packages)
-  - [5.5. Upgrading package dependencies](#55-upgrading-package-dependencies)
-- [6. CLI Reference](#6-cli-reference)
-  - [6.1. `install`](#61-install)
-  - [6.2. `link`](#62-link)
-  - [6.3. `refresh`](#63-refresh)
-  - [6.4. `watch`](#64-watch)
-  - [6.5. `upgrade`](#65-upgrade)
-- [7. Appreciation](#7-appreciation)
-- [8. Further Reading / References](#8-further-reading--references)
+- [5. Requirements](#5-requirements)
+- [6. Guide](#6-guide)
+  - [6.1. Installing your dependencies](#61-installing-your-dependencies)
+  - [6.2. Linking packages](#62-linking-packages)
+  - [6.3. Updating linked packages](#63-updating-linked-packages)
+  - [6.4. Watching updates to linked packages](#64-watching-updates-to-linked-packages)
+  - [6.5. Upgrading package dependencies](#65-upgrading-package-dependencies)
+- [7. CLI Reference](#7-cli-reference)
+  - [7.1. `clean`](#71-clean)
+  - [7.2. `install`](#72-install)
+  - [7.3. `link`](#73-link)
+  - [7.4. `refresh`](#74-refresh)
+  - [7.5. `watch`](#75-watch)
+  - [7.6. `upgrade`](#76-upgrade)
+- [8. Appreciation](#8-appreciation)
+- [9. Further Reading / References](#9-further-reading--references)
 
 &nbsp;
 
@@ -60,15 +62,9 @@ We lean heavily into a "standard" npm experience and promote the capability for 
 
 ---
 
-## 2. Goals
+## 2. Motivation
 
-- Leverage standard `npm` as far as possible.
-
-  At any time you should be able to stop using `monilla` and just run standard `npm` commands. Yes, you might have to execute a lot of `npm` commands depending on how many packages are in your project, but you'll be able to do so at the least.
-
-- Treat each package as though it were an independent `npm` package.
-
-  We expect that each package within your monorepo is built almost as if it were independent. It's own package.json scripts, dependencies, etc. This enables richer workflows for packages being operated against in isolation. For example, cleaner publishing workflows for packages to an `npm` registry, or simple lifting and shifting of packages in or out of your monorepo.
+_Coming soon_
 
 &nbsp;
 
@@ -76,12 +72,18 @@ We lean heavily into a "standard" npm experience and promote the capability for 
 
 ## 3. Prerequisites
 
-**Node.js** version 16 or higher is required to use this CLI.
+**Node.js** version 18 or higher is required to use this CLI.
+
+> **Note**
+>
+> There was a change in behaviour between npm versions in how linked package dependencies were installed. A flag (`--install-links`) was introduced to the npm CLI to address this issue.
+>
+> Node 18 by default ships with a version of npm which includes support for this flag. Therefore we are making it a requirement that you utilise Node 18.
 
 We highly recommend installing [nvm](https://github.com/nvm-sh/nvm) on your machine. It enables you to manage multiple versions of Node.js seamlessly. Utilising `nvm` you can install the required version of Node.js via the following command;
 
 ```bash
-nvm install --default 16
+nvm install --default 18
 ```
 
 > **Note**
@@ -104,7 +106,56 @@ npm install monilla --save-dev
 
 ---
 
-## 5. Guide
+## 5. Requirements
+
+**Linked Packages `package.json` Design**
+
+We expect that each package within your monorepo is built almost as if it were independent package, that _could_ be published to npm.
+
+This means that you need to;
+
+- add all the expected dependencies to your `package.json` to meet your package's needs;
+- define the `main` _or_ `exports` _or_ `module` fields to indicate the entries and available imports from your package;
+- define the `files` list, declaring which dirs/files should be exposed by your package;
+
+For e.g.
+
+```json
+{
+  "name": "@my/stuff",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "chalk": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.41",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4"
+  }
+}
+```
+
+> **Note**
+>
+> We declare our package as "private" with a version of "0.0.0". This is intentional as we never intend to actually publish our package to npm. It will only be used by other packages within the monorepo.
+
+We will perform an "npm pack" of your linked packages, carrying across the expected files that would have been exposed if it were published to npm.
+
+This enables us to produce an `npm install` behaviour for your linked packages that is essentially the same as a vanilla install should the package have been downloaded from the npm registry.
+
+&nbsp;
+
+---
+
+## 6. Guide
 
 Imagine a monorepo with the following structure:
 
@@ -139,7 +190,7 @@ Using this as a reference, we'll describe a few scenarios below.
 
 &nbsp;
 
-### 5.1. Installing your dependencies
+### 6.1. Installing your dependencies
 
 ```bash
 npx monilla install
@@ -152,7 +203,7 @@ This performs two functions;
 
 &nbsp;
 
-### 5.2. Linking packages
+### 6.2. Linking packages
 
 Linking enables you to utilise one of your monorepo packages within another as though it were installed via the NPM registry.
 
@@ -174,7 +225,7 @@ npx monilla link --from @my/components --to @my/mobile-app
 
 &nbsp;
 
-### 5.3. Updating linked packages
+### 6.3. Updating linked packages
 
 If you've performed updates to one of your linked packages, you can ensure that all dependants are using the latest version of them via the following command;
 
@@ -188,7 +239,7 @@ npx monilla refresh
 
 &nbsp;
 
-### 5.4. Watching updates to linked packages
+### 6.4. Watching updates to linked packages
 
 Watching your linked packages results in automatic building and pushing of the updates;
 
@@ -204,7 +255,7 @@ This command is especially useful when performing local development across your 
 
 &nbsp;
 
-### 5.5. Upgrading package dependencies
+### 6.5. Upgrading package dependencies
 
 We support interactive upgrading of the dependencies for all the packages within your monorepo;
 
@@ -222,7 +273,7 @@ You'll be asked which packages you'd like to update for each of the packages wit
 
 ---
 
-## 6. CLI Reference
+## 7. CLI Reference
 
 Work in progress. You can get help via the CLI `--help` flag;
 
@@ -230,7 +281,15 @@ Work in progress. You can get help via the CLI `--help` flag;
 npx monilla --help
 ```
 
-### 6.1. `install`
+### 7.1. `clean`
+
+```bash
+npx monilla clean
+```
+
+Removes all `node_modules` folders and `package-lock.json` files from across the monorepo. Supports the good old "nuke and retry" strategy when in dire need.
+
+### 7.2. `install`
 
 ```bash
 npx monilla install
@@ -238,10 +297,10 @@ npx monilla install
 
 This performs two functions;
 
-- Installs the required dependencies for each package within the monorepo, including the root.
-- Ensures that any linked packages within the monorepo are bound.
+- Installs the dependencies for every package, including the root.
+- Ensures that any linked packages are bound.
 
-### 6.2. `link`
+### 7.3. `link`
 
 ```bash
 npx monilla link --from @my/components --to @my/mobile-app
@@ -249,7 +308,7 @@ npx monilla link --from @my/components --to @my/mobile-app
 
 Link monorepo packages, declaring the `from` package as a dependency within the `to` package.
 
-### 6.3. `refresh`
+### 7.4. `refresh`
 
 ```bash
 npx monilla refresh
@@ -257,7 +316,7 @@ npx monilla refresh
 
 Ensures that packages are using the latest form of their internal packages dependencies that have been linked against them.
 
-### 6.4. `watch`
+### 7.5. `watch`
 
 ```bash
 npx monilla watch
@@ -265,7 +324,7 @@ npx monilla watch
 
 Starts a "development" process that will watch your linked packages for any changes, and will automatically update consuming packages to use the updated versions.
 
-### 6.5. `upgrade`
+### 7.6. `upgrade`
 
 ```bash
 npx monilla upgrade
@@ -277,7 +336,7 @@ Perform an interactive upgrade of the dependencies for all the packages within y
 
 ---
 
-## 7. Appreciation
+## 8. Appreciation
 
 A huge thank you goes to [@wclr](https://github.com/wclr) for the outstanding work on [Yalc](https://github.com/wclr/yalc). The Yalc workflow is the specific seed which enabled this idea to grow. 🌻
 
@@ -287,7 +346,7 @@ An additional thank you is extended to [@raineorshine](https://github.com/raineo
 
 ---
 
-## 8. Further Reading / References
+## 9. Further Reading / References
 
 - [monorepo.tools - Everything you need to know about monorepos, and the tools to build them.](https://monorepo.tools/)
 - [An abbreviated history of JavaScript package managers](https://javascript.plainenglish.io/an-abbreviated-history-of-javascript-package-managers-f9797be7cf0e)

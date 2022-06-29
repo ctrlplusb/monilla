@@ -1,6 +1,6 @@
 {
   "name": "monilla",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A CLI to manage monorepos with predictability and stability.",
   "homepage": "https://github.com/ctrlplusb/monilla",
   "engines": {
